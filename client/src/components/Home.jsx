@@ -1,28 +1,63 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
 
 const Home = () => {
   return (
-    <div style={{ width: 375, height: 812, position: 'relative', background: 'white' }}>
+    <div className="w-[1280px] h-[832px] relative bg-white overflow-hidden">
       {/* Navigation Bar */}
-      <div style={{ width: '100%', height: 50, position: 'absolute', top: 0, left: 0, background: '#004DFF', display: 'flex', justifyContent: 'space-around', alignItems: 'center' }}>
-        <Link to="/" style={{ color: 'white', fontSize: 16, fontWeight: 500, fontFamily: 'Inter', textDecoration: 'none' }}>Home</Link>
-        <Link to="/user" style={{ color: 'white', fontSize: 16, fontWeight: 500, fontFamily: 'Inter', textDecoration: 'none' }}>Browse</Link>
-        <Link to="/account" style={{ color: 'white', fontSize: 16, fontWeight: 500, fontFamily: 'Inter', textDecoration: 'none' }}>Account</Link>
+      <div className="w-40 h-7 left-[28px] top-[23px] absolute bg-blue-600" />
+      <div className="w-40 h-8 left-[34px] top-[20px] absolute justify-start text-white text-xl font-normal font-['Propaganda']">UNCENSORED</div>
+      <div className="left-[27px] top-[37px] absolute text-justify justify-start text-blue-600 text-5xl font-normal font-['Propaganda']">SH*TS</div>
+
+      {/* Search Bar */}
+      <div className="w-[954px] h-11 pl-3 pr-4 py-2 left-[221px] top-[35px] absolute bg-✦-_bg-bg-secondary rounded-lg inline-flex justify-start items-center gap-3">
+        <div className="w-6 h-6 relative overflow-hidden">
+          <div className="w-4 h-4 left-[3px] top-[3px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-500" />
+          <div className="w-1 h-1 left-[16.65px] top-[16.65px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-500" />
+        </div>
+        <div className="flex-1 justify-start text-zinc-500 text-base font-normal font-['Inter'] leading-normal">Search</div>
       </div>
 
-      <div style={{ width: 112, height: 112, left: 131, top: 214, position: 'absolute', background: '#004DFF', borderRadius: 9999 }}></div>
-      <div style={{ left: 85, top: 167, position: 'absolute', textAlign: 'center', color: '#004DFF', fontSize: 24, fontFamily: 'Propaganda', fontWeight: '400', wordWrap: 'break-word' }}>uncensored sh*ts</div>
-      <div style={{ left: 147, top: 331, position: 'absolute', textAlign: 'center', color: '#004DFF', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: '22.40px', wordWrap: 'break-word' }}>
-        join the sh*tshow
+      {/* Top Buttons */}
+      <div className="px-2.5 py-[5px] left-[28px] top-[117px] absolute rounded-md outline outline-1 outline-offset-[-1px] outline-✦-_border-border-default inline-flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+        <div className="inline-flex justify-start items-center gap-1">
+          <div className="w-4 h-4 relative overflow-hidden">
+            <div className="w-4 h-3.5 left-[1.12px] top-[1.69px] absolute bg-blue-600" />
+          </div>
+          <div className="justify-start text-✦-_text-text-default/90 text-sm font-medium font-['Inter'] leading-snug">Favorites</div>
+        </div>
       </div>
-      <div style={{ width: 135, height: 36, left: 120, top: 387, position: 'absolute', background: '#004DFF', borderRadius: 9999 }}></div>
-      <div style={{ left: 145, top: 392, position: 'absolute', color: 'white', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: '22.40px', wordWrap: 'break-word' }}>sign up</div>
-      <div style={{ left: 109, top: 446, position: 'absolute', textAlign: 'center', color: '#004DFF', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: '22.40px', wordWrap: 'break-word' }}>
-        already a sh*tter?
+      <div className="px-2.5 py-[5px] left-[140px] top-[117px] absolute rounded-md outline outline-1 outline-offset-[-1px] outline-✦-_border-border-default inline-flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+        <div className="inline-flex justify-start items-center gap-1">
+          <div className="w-4 h-4 relative overflow-hidden">
+            <div className="w-4 h-4 left-0 top-[1.12px] absolute bg-blue-600" />
+          </div>
+          <div className="justify-start text-zinc-900 text-sm font-medium font-['Inter'] leading-snug">History</div>
+        </div>
       </div>
-      <div style={{ width: 135, height: 36, left: 120, top: 492, position: 'absolute', background: '#004DFF', borderRadius: 9999 }}></div>
-      <div style={{ left: 145, top: 497, position: 'absolute', color: 'white', fontSize: 16, fontFamily: 'Inter', fontWeight: '500', lineHeight: '22.40px', wordWrap: 'break-word' }}>log in</div>
+      <div className="px-2.5 py-[5px] left-[239px] top-[117px] absolute rounded-md outline outline-1 outline-offset-[-1px] outline-✦-_border-border-default inline-flex flex-col justify-start items-start gap-2.5 overflow-hidden">
+        <div className="inline-flex justify-start items-center gap-1">
+          <div className="w-4 h-4 relative overflow-hidden">
+            <div className="w-4 h-4 left-[0.75px] top-[1.50px] absolute bg-blue-600" />
+          </div>
+          <div className="justify-start text-zinc-900 text-sm font-medium font-['Inter'] leading-snug">Recs Nearby</div>
+        </div>
+      </div>
+
+      {/* Featured Image */}
+      <div className="w-[790px] h-[620px] left-[28px] top-[178px] absolute rounded-lg outline outline-[10px] outline-offset-[-10px] outline-blue-600 overflow-hidden">
+        <img className="w-[991px] h-[620px] left-[-96px] top-0 absolute" src="https://placehold.co/991x620" alt="Featured Bathroom" />
+      </div>
+
+      {/* Section Title */}
+      <div className="w-72 h-12 left-[843px] top-[127px] absolute text-justify justify-start text-blue-600 text-xl font-normal font-['Propaganda']">
+        have you ever tried...
+      </div>
+
+      {/* Bathroom Listings */}
+      <div className="w-96 h-[644px] left-[835px] top-[154px] absolute bg-✦-_bg-bg-default rounded-tl-3xl rounded-tr-3xl overflow-hidden">
+        {/* Bathrooms will go here */}
+        {/* You can insert mapped bathrooms dynamically later */}
+      </div>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const ratingSchema = new mongoose.Schema({
-  userId: String,
+  userEmail: String, // ← unique per user
   score: Number,
 }, { _id: false });
 
