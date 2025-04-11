@@ -1,14 +1,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/**/*.{js,jsx,ts,tsx}",   // 👈 tell Tailwind to look inside your React project
+    "./src/**/*.{js,jsx,ts,tsx}",
   ],
-  darkMode: false, // or 'media' or 'class'
+  darkMode: false,
   theme: {
     extend: {
       fontFamily: {
-        propaganda: ['Propaganda', 'sans-serif'],
-      },
+        boldonse: ['Boldonse', 'sans-serif'],
+      }, // ✅ COMMA here
       colors: {
         'bg-secondary': '#f4f4f5',
         'text-default': '#1f2937',

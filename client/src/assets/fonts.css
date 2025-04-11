@@ -1,7 +1,13 @@
-.boldonse-regular {
-    font-family: "Boldonse", system-ui;
-    font-weight: 400;
-    font-style: normal;
-  }
-  
-  
+@font-face {
+  font-family: 'Boldonse';
+  src: url('./Boldonse.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Propaganda';
+  src: url('./Propaganda_Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}

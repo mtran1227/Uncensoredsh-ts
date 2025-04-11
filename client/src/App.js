@@ -1,23 +1,21 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './components/Home';
-import User from './components/User';
+import BathroomProfile from './components/BathroomProfile';  // 👈 import it!
+
+
 import Account from './components/Account';
-import Loading from './components/Loading';
-import Rating from './components/Rating';
+// (No User import!)
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* 🏠 This is the homepage */}
         <Route path="/" element={<Home />} />
-
-        {/* Other pages */}
-        <Route path="/user" element={<User />} />
         <Route path="/account" element={<Account />} />
-        <Route path="/loading" element={<Loading />} />
-        <Route path="/rating" element={<Rating />} />
+        <Route path="/bathrooms/:id" element={<BathroomProfile />} />
+
+        {/* (No User route!) */}
       </Routes>
     </Router>
   );

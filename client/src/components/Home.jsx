@@ -1,80 +1,41 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-
 
 const Home = () => {
   return (
-    <div className="w-[1280px] h-[832px] relative bg-white overflow-hidden">
-      {/* Navigation Bar */}
-      <div className="w-40 h-7 left-[28px] top-[23px] absolute bg-blue-600" />
-      <div className="w-40 h-8 left-[34px] top-[20px] absolute justify-start text-white text-xl font-normal font-['Propaganda']">UNCENSORED</div>
-      <div className="left-[27px] top-[37px] absolute text-justify justify-start text-blue-600 text-5xl font-normal font-['Propaganda']">SH*TS</div>
-
-      {/* Search Bar */}
-      <div className="w-[954px] h-11 pl-3 pr-4 py-2 left-[221px] top-[35px] absolute bg-✦-_bg-bg-secondary rounded-lg inline-flex justify-start items-center gap-3">
-        <div className="w-6 h-6 relative overflow-hidden">
-          <div className="w-4 h-4 left-[3px] top-[3px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-500" />
-          <div className="w-1 h-1 left-[16.65px] top-[16.65px] absolute outline outline-2 outline-offset-[-1px] outline-zinc-500" />
-        </div>
-        <div className="flex-1 justify-start text-zinc-500 text-base font-normal font-['Inter'] leading-normal">Search</div>
-      </div>
-
-      {/* Top Buttons */}
-      <div className="px-2.5 py-[5px] left-[28px] top-[117px] absolute rounded-md outline outline-1 outline-offset-[-1px] outline-✦-_border-border-default inline-flex flex-col justify-start items-start gap-2.5 overflow-hidden">
-        <div className="inline-flex justify-start items-center gap-1">
-          <div className="w-4 h-4 relative overflow-hidden">
-            <div className="w-4 h-3.5 left-[1.12px] top-[1.69px] absolute bg-blue-600" />
+    <div style={{ width: '1280px', height: '832px', position: 'relative', background: 'white' }}>
+      <div style={{ padding: '12px 26px 8px 26px', position: 'absolute', left: '1175px', top: '23px' }}>
+        <a href="/account.html">
+          <div data-svg-wrapper style={{ position: 'relative' }}>
+            <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M23.995 4C29.5297 4 34.0034 8.48 34.0034 14C34.0034 19.52 29.5297 24 23.995 24C18.4703 24 13.9865 19.52 13.9865 14C13.9865 8.48 18.4703 4 23.995 4ZM23.995 8C20.6822 8 17.9899 10.69 17.9899 14C17.9899 17.31 20.6822 20 23.995 20C27.3178 20 30.0001 17.31 30.0001 14C30.0001 10.69 27.3178 8 23.995 8ZM23.995 27C34.2937 27 40.6691 33.99 40.9994 44C41.0194 44.55 40.569 45 40.0085 45H38.0068C37.4564 45 37.016 44.55 36.996 44C36.6957 36.16 32.0918 31 23.995 31C15.9082 31 11.3043 36.16 11.004 44C10.984 44.55 10.5436 45 9.98316 45H7.98147C7.43101 45 6.98063 44.55 7.00064 44C7.33092 33.99 13.7063 27 23.995 27Z" fill="#004DFF" />
+            </svg>
           </div>
-          <div className="justify-start text-✦-_text-text-default/90 text-sm font-medium font-['Inter'] leading-snug">Favorites</div>
-        </div>
-      </div>
-      <div className="px-2.5 py-[5px] left-[140px] top-[117px] absolute rounded-md outline outline-1 outline-offset-[-1px] outline-✦-_border-border-default inline-flex flex-col justify-start items-start gap-2.5 overflow-hidden">
-        <div className="inline-flex justify-start items-center gap-1">
-          <div className="w-4 h-4 relative overflow-hidden">
-            <div className="w-4 h-4 left-0 top-[1.12px] absolute bg-blue-600" />
-          </div>
-          <div className="justify-start text-zinc-900 text-sm font-medium font-['Inter'] leading-snug">History</div>
-        </div>
-      </div>
-      <div className="px-2.5 py-[5px] left-[239px] top-[117px] absolute rounded-md outline outline-1 outline-offset-[-1px] outline-✦-_border-border-default inline-flex flex-col justify-start items-start gap-2.5 overflow-hidden">
-        <div className="inline-flex justify-start items-center gap-1">
-          <div className="w-4 h-4 relative overflow-hidden">
-            <div className="w-4 h-4 left-[0.75px] top-[1.50px] absolute bg-blue-600" />
-          </div>
-          <div className="justify-start text-zinc-900 text-sm font-medium font-['Inter'] leading-snug">Recs Nearby</div>
-        </div>
-        <Link to="/account">
-  <div className="px-2.5 py-2 absolute left-[340px] top-[117px] rounded-md bg-blue-600 text-white text-sm font-medium font-['Inter'] leading-snug cursor-pointer">
-    Account
-  </div>
-</Link>
-
+        </a>
       </div>
 
-      {/* Featured Image */}
-      <div className="w-[790px] h-[620px] left-[28px] top-[178px] absolute rounded-lg outline outline-[10px] outline-offset-[-10px] outline-blue-600 overflow-hidden">
-  <iframe
-    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3023.477500015649!2d-73.99903582490029!3d40.72951743654445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c2599af55395c1%3A0xda30743171b5f305!2sNew%20York%20University!5e0!3m2!1sen!2sus!4v1743806216226!5m2!1sen!2sus"
-    width="100%"
-    height="100%"
-    style={{ border: 0 }}
-    allowFullScreen=""
-    loading="lazy"
-    referrerPolicy="no-referrer-when-downgrade"
-    title="NYU Map"
-  ></iframe>
-</div>
+      <div style={{ width: '790px', height: '620px', left: '28px', top: '178px', position: 'absolute', overflow: 'hidden', borderRadius: '8px', outline: '10px solid #004DFF', outlineOffset: '-10px' }}>
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d12094.346366964255!2d-73.99475595000001!3d40.7271164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1744410164290!5m2!1sen!2sus"
+          width="800"
+          height="600"
+          style={{ border: 0 }}
+          allowFullScreen=""
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          title="NYU Map"
+        ></iframe>
+      </div>
 
-
-      {/* Section Title */}
-      <div className="w-72 h-12 left-[843px] top-[127px] absolute text-justify justify-start text-blue-600 text-xl font-normal font-['Propaganda']">
+      <div style={{ width: '273px', height: '49px', left: '843px', top: '127px', position: 'absolute', textAlign: 'justify', color: '#004DFF', fontSize: '20px', fontFamily: 'Propaganda', fontWeight: 400 }}>
         have you ever tried...
       </div>
 
-      {/* Bathroom Listings */}
-      <div className="w-96 h-[644px] left-[835px] top-[154px] absolute bg-✦-_bg-bg-default rounded-tl-3xl rounded-tr-3xl overflow-hidden">
-        {/* Bathrooms will go here */}
-        {/* You can insert mapped bathrooms dynamically later */}
+      <div style={{ width: '167.20px', height: '27.02px', left: '28px', top: '23.38px', position: 'absolute', background: '#004DFF' }}></div>
+      <div style={{ width: '157.07px', height: '30.40px', left: '34px', top: '20px', position: 'absolute', color: 'white', fontSize: '20px', fontFamily: 'Propaganda', fontWeight: 400 }}>
+        UNCENSORED
+      </div>
+      <div style={{ left: '27px', top: '37px', position: 'absolute', textAlign: 'justify', color: '#004DFF', fontSize: '48px', fontFamily: 'Propaganda', fontWeight: 400 }}>
+        SH*TS
       </div>
     </div>
   );
