@@ -1,4 +1,6 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
 
 const Home = () => {
   return (
@@ -41,12 +43,28 @@ const Home = () => {
           </div>
           <div className="justify-start text-zinc-900 text-sm font-medium font-['Inter'] leading-snug">Recs Nearby</div>
         </div>
+        <Link to="/account">
+  <div className="px-2.5 py-2 absolute left-[340px] top-[117px] rounded-md bg-blue-600 text-white text-sm font-medium font-['Inter'] leading-snug cursor-pointer">
+    Account
+  </div>
+</Link>
+
       </div>
 
       {/* Featured Image */}
       <div className="w-[790px] h-[620px] left-[28px] top-[178px] absolute rounded-lg outline outline-[10px] outline-offset-[-10px] outline-blue-600 overflow-hidden">
-        <img className="w-[991px] h-[620px] left-[-96px] top-0 absolute" src="https://placehold.co/991x620" alt="Featured Bathroom" />
-      </div>
+  <iframe
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3023.477500015649!2d-73.99903582490029!3d40.72951743654445!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89c2599af55395c1%3A0xda30743171b5f305!2sNew%20York%20University!5e0!3m2!1sen!2sus!4v1743806216226!5m2!1sen!2sus"
+    width="100%"
+    height="100%"
+    style={{ border: 0 }}
+    allowFullScreen=""
+    loading="lazy"
+    referrerPolicy="no-referrer-when-downgrade"
+    title="NYU Map"
+  ></iframe>
+</div>
+
 
       {/* Section Title */}
       <div className="w-72 h-12 left-[843px] top-[127px] absolute text-justify justify-start text-blue-600 text-xl font-normal font-['Propaganda']">
