@@ -1,1 +1,24 @@
-{}
+{
+  "dependencies": {
+    "axios": "^1.8.4",
+    "mongoose": "^8.13.2"
+  },
+  "name": "uncensoredsh-ts",
+  "version": "1.0.0",
+  "description": "rank ur favorite nyu shits",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mtran1227/Uncensoredsh-ts.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mtran1227/Uncensoredsh-ts/issues"
+  },
+  "homepage": "https://github.com/mtran1227/Uncensoredsh-ts#readme"
+}

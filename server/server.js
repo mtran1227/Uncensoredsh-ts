@@ -1,5 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const ratingRoutes = require('./routes/rating');
 const cors = require('cors');
 require('dotenv').config();
 
@@ -10,6 +12,9 @@ app.use(express.json());
 // Import and use routes
 const bathroomRoutes = require('./routes/bathrooms');
 app.use('/api/bathrooms', bathroomRoutes);
+
+const ratingRoutes = require('./routes/ratings');
+app.use('/api/ratings', ratingRoutes);
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/uncensoredsh-ts', {
