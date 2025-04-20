@@ -1,6 +1,8 @@
+import Rating from './Rating';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+
 
 const BathroomProfile = () => {
   const { id } = useParams();
@@ -60,15 +62,10 @@ const BathroomProfile = () => {
           required
           style={{ display: 'block', marginBottom: '1rem' }}
         />
-        <input
-          type="number"
-          placeholder="Rating (1-5)"
-          value={rating}
-          onChange={(e) => setRating(Number(e.target.value))}
-          min="1"
-          max="5"
-          required
-          style={{ display: 'block', marginBottom: '1rem' }}
+        <Rating
+          bathroomId={id}
+          initial={rating}
+          onRate={(val) => setRating(val)}
         />
         <button type="submit" style={{ padding: '0.5rem 1rem', backgroundColor: '#007BFF', color: 'white', border: 'none' }}>
           Submit Rating

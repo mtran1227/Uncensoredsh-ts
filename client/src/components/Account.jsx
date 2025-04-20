@@ -45,10 +45,10 @@ const Account = () => {
         </div>
         <div className="w-40 h-40 left-[27px] top-[162px] absolute bg-blue-600 rounded-full" />
         <div className="left-[222px] top-[162px] absolute text-blue-600 text-3xl font-normal font-['Propaganda']">
-          @uncensoredshts
+          @mai_shts
         </div>
         <div className="left-[221px] top-[225px] absolute text-blue-600 text-2xl font-normal font-['Propaganda']">
-          uncensored sh*ts
+          NYU's resident toilet tour guide
         </div>
         <div className="left-[221px] top-[305px] absolute text-blue-600 text-base font-['Inter']">
           <span className="font-bold">313 </span>friends
@@ -72,7 +72,7 @@ const Account = () => {
 
         {/* Section Title */}
         <div className="w-72 h-12 left-[35px] top-[343px] absolute text-blue-600 text-xl font-normal font-['Propaganda']">
-          FAVS
+          FAVORITES:
         </div>
 
         {/* Bathroom Listings */}
