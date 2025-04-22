@@ -669,109 +669,53 @@
         <div
             style="width: 273px; height: 49px; left: 35px; top: 308px; position: absolute; text-align: justify; color: #004DFF; font-size: 20px; font-family: Propaganda; font-weight: 400; word-wrap: break-word">
             FAVS</div>
-            <div style="position: absolute; top: 35px; left: 221px; width: 954px;">
-                <div
-                  style="height: 43px; padding: 8px 16px 8px 12px; background: #F5F5F5; border-radius: 8px; display: flex; align-items: center; gap: 12px;">
-                  <div style="width: 24px; height: 24px; position: relative;">
-                    <!-- Circle -->
-                    <div data-svg-wrapper style="position: absolute; left: 3px; top: 3px;">
-                      <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M9 17.5C13.4183 17.5 17 13.9183 17 9.5C17 5.08172 13.4183 1.5 9 1.5C4.58172 1.5 1 5.08172 1 9.5C1 13.9183 4.58172 17.5 9 17.5Z"
-                              stroke="#828282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </div>
-                  
-                    <!-- Slash (line) -->
-                    <div data-svg-wrapper style="position: absolute; left: 16px; top: 10px;">
-                      <svg width="7" height="6" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M5.9999 5.50039L1.6499 1.15039" stroke="#828282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                      </svg>
-                    </div>
-                  </div>
-                  
-                  <input id="searchBar" type="text" placeholder="Search for a bathroom..."
-                    style="flex: 1; border: none; background: transparent; font-family: Inter; font-size: 16px; color: #828282; outline: none;" />
+        <div
+            style="width: 1033px; height: 43px; padding-top: 8px; padding-bottom: 8px; padding-left: 12px; padding-right: 16px; left: 221px; top: 35px; position: absolute; background: #F5F5F5; border-radius: 8px; justify-content: flex-start; align-items: center; gap: 12px; display: inline-flex">
+            <div style="width: 24px; height: 24px; position: relative; overflow: hidden">
+                <div data-svg-wrapper style="left: 3px; top: 3px; position: absolute">
+                    <svg width="18" height="19" viewBox="0 0 18 19" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M9 17.5C13.4183 17.5 17 13.9183 17 9.5C17 5.08172 13.4183 1.5 9 1.5C4.58172 1.5 1 5.08172 1 9.5C1 13.9183 4.58172 17.5 9 17.5Z"
+                            stroke="#828282" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
                 </div>
-                <div style="position: relative;">
-                    <div id="resultBox"
-                      style="position: absolute; top: 10px; left: 0; right: 0; background: white; border: 1px solid #ccc; border-radius: 8px; max-height: 300px; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-family: Inter; font-size: 14px; display: none; z-index: 999;">
-                    </div>
-                  </div>
-                  
-              </div>
-              
-              <script>
-                const bathrooms = [
-                  "Bobst LL1",
-                  "Bobst LL2",
-                  "Bobst 7th Floor",
-                  "2 Metrotech 8th Floor",
-                  "2 Metrotech 9th Floor",
-                  "6 Metrotech Basement",
-                  "Kimmel 2nd Floor",
-                  "Kimmel 7th Floor",
-                  "Paulson 2nd Floor",
-                  "370 Jay Street 3rd Floor"
-                ];
-              
-                const searchBar = document.getElementById('searchBar');
-                const resultBox = document.getElementById('resultBox');
-              
-                searchBar.addEventListener('input', () => {
-                  const query = searchBar.value.toLowerCase();
-                  resultBox.innerHTML = '';
-                  if (query.trim() === '') {
-                    resultBox.style.display = 'none';
-                    return;
-                  }
-              
-                  const matches = bathrooms.filter(name => name.toLowerCase().includes(query));
-                  matches.forEach(name => {
-                    const item = document.createElement('div');
-                    item.textContent = name;
-                    item.style.padding = "12px 20px";
-                    item.style.cursor = "pointer";
-                    item.style.color = "#1A1A1A";
-                    item.onmouseover = () => item.style.backgroundColor = "#f0f0f0";
-                    item.onmouseout = () => item.style.backgroundColor = "white";
-                    item.onclick = () => {
-                      const link = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-                      window.location.href = `${link}.html`; // redirect
-                    };
-                    resultBox.appendChild(item);
-                  });
-                  resultBox.style.display = matches.length > 0 ? 'block' : 'none';
-                });
-              </script>
-              
-
+                <div data-svg-wrapper style="left: 16.65px; top: 16.65px; position: absolute">
+                    <svg width="7" height="7" viewBox="0 0 7 7" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M5.9999 5.50039L1.6499 1.15039" stroke="#828282" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+            </div>
+            <div
+                style="flex: 1 1 0; color: #828282; font-size: 16px; font-family: Inter; font-weight: 400; line-height: 24px; word-wrap: break-word">
+                Search</div>
+        </div>
         <div
             style="width: 167.20px; height: 27.02px; left: 28px; top: 23.38px; position: absolute; background: #004DFF">
         </div>
-        <a href="homescreen.html" style="text-decoration: none;">
-            <div style="width: 167.20px; height: 27.02px; left: 28px; top: 23.38px; position: absolute; background: #004DFF; z-index: 1;"></div>
-            <div style="width: 200.07px; height: 30.40px; left: 34px; top: 20px; position: absolute; color: white; font-size: 20px; font-family: Propaganda; font-weight: 400; word-wrap: break-word; z-index: 2;">
-              UNCENSORED
-            </div>
-            <div style="left: 27px; top: 37px; position: absolute; text-align: justify; color: #004DFF; font-size: 48px; font-family: Propaganda; font-weight: 400; word-wrap: break-word; z-index: 2;">
-              SH*TS
-            </div>
-          </a>    
+        <a href="index.html">
+            <div
+                style="width: 157.07px; height: 30.40px; left: 34px; top: 20px; position: absolute; color: white; font-size: 20px; font-family: Propaganda; font-weight: 400; word-wrap: break-word">
+                UNCENSORED</div>
+            <div
+                style="left: 27px; top: 37px; position: absolute; text-align: justify; color: #004DFF; font-size: 48px; font-family: Propaganda; font-weight: 400; word-wrap: break-word">
+                SH*TS</div>
+        </a>
         <div
             style="left: 221px; top: 231px; position: absolute; text-align: center; color: #004DFF; font-size: 16px; font-family: Inter; font-weight: 500; line-height: 22.40px; word-wrap: break-word">
-            Creators of this sh*t: Flushing out the truth, one bathroom at a time </div>
+            On the hunt for the perfect bathroom </div>
         <div
             style="width: 164px; height: 164px; left: 27px; top: 127px; position: absolute; background: #004DFF; border-radius: 9999px">
         </div>
         <div
             style="left: 221px; top: 127px; position: absolute; text-align: justify; color: #004DFF; font-size: 40px; font-family: Propaganda; font-weight: 400; word-wrap: break-word">
-            @maishtsnyu</div>
+            @deanofdump</div>
         <div
             style="left: 221px; top: 190px; position: absolute; text-align: justify; color: #004DFF; font-size: 20px; font-family: Propaganda; font-weight: 400; word-wrap: break-word">
-            Unofficial NYU Bathroom Connoisseur</div>
+            Senior Bathroom Analyst</div>
         <a href="friends.html" style="text-decoration: none; color: inherit; text-align: center;">
             <div style="left: 221px; top: 270px; position: absolute; text-align: center"><span
-                    style="color: #004DFF; font-size: 15px; font-family: Inter; font-weight: 700; line-height: 21px; word-wrap: break-word">47
+                    style="color: #004DFF; font-size: 15px; font-family: Inter; font-weight: 700; line-height: 21px; word-wrap: break-word">36
                 </span><span
                     style="color: #004DFF; font-size: 15px; font-family: Inter; font-weight: 400; line-height: 21px; word-wrap: break-word">friends</span>
             </div>
@@ -784,7 +728,7 @@
                     <div style="width: 96px; height: 96px; background: #004DFF; border-radius: 16px; 
                                 color: white; font-size: 48px; display: flex; align-items: center; 
                                 justify-content: center; font-family: Inter, sans-serif; font-weight: 700;">
-                      12
+                      9
                     </div>
                     <div style="color: #004DFF; font-size: 20px; margin-top: 8px; font-family: Inter, sans-serif; font-weight: 500;">
                       sh*t in
@@ -798,7 +742,7 @@
                     <div style="width: 96px; height: 96px; background: #004DFF; border-radius: 16px; 
                                 color: white; font-size: 48px; display: flex; align-items: center; 
                                 justify-content: center; font-family: Inter, sans-serif; font-weight: 700;">
-                      3
+                      4
                     </div>
                     <div style="color: #004DFF; font-size: 20px; margin-top: 8px; font-family: Inter, sans-serif; font-weight: 500;">
                       want to sh*t in
