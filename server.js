@@ -16,6 +16,10 @@ app.use('/api/bathrooms', bathroomRoutes);
 const ratingRoutes = require('./server/routes/rating');
 app.use('/api/ratings', ratingRoutes);
 
+const authRoutes = require('./server/routes/auth');
+app.use('/api/auth', authRoutes);
+
+
 // Connect to MongoDB using the new URI from .env
 mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
