@@ -42,6 +42,14 @@
       border-radius: 8px;
       margin-right: 20px;
     }
+    .thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* fills the box without distortion, crops overflow */
+  border-radius: 8px;
+  display: block; /* removes any spacing below the image */
+}
+
 
     .info {
       display: flex;
@@ -81,7 +89,7 @@
   <h1>Your History</h1>
   <div class="history-list">
     <div class="entry">
-      <div class="thumbnail"></div>
+      <div class="thumbnail"><img src="/bathroomphotos/bathroom_7.png" alt="Bathroom" /></div>
       <div class="info">
         <div class="name">Bobst 4th Floor</div>
         <div class="location">New York, NY</div>
@@ -91,7 +99,8 @@
     </div>
 
     <div class="entry">
-      <div class="thumbnail"></div>
+      <div class="thumbnail"><img src="/bathroomphotos/bathroom_1.png" alt="Bathroom" />
+      </div>
       <div class="info">
         <div class="name">Courant 1st Floor</div>
         <div class="location">New York, NY</div>
@@ -101,7 +110,7 @@
     </div>
 
     <div class="entry">
-      <div class="thumbnail"></div>
+      <div class="thumbnail"><img src="/bathroomphotos/palladium2nd.png" alt="Bathroom" /></div>
       <div class="info">
         <div class="name">Palladium 2nd Floor</div>
         <div class="location">New York, NY</div>
@@ -111,7 +120,7 @@
     </div>
 
     <div class="entry">
-      <div class="thumbnail"></div>
+      <div class="thumbnail"><img src="/bathroomphotos/bathroom4.png" alt="Bathroom" /></div>
       <div class="info">
         <div class="name">Paulson 2nd Floor</div>
         <div class="location">New York, NY</div>
@@ -121,7 +130,7 @@
     </div>
 
     <div class="entry">
-      <div class="thumbnail"></div>
+      <div class="thumbnail"><img src="/bathroomphotos/bathroom6.png" alt="Bathroom" /></div>
       <div class="info">
         <div class="name">Silver Center 6th Floor</div>
         <div class="location">New York, NY</div>
