@@ -17,5 +17,4 @@ module.exports = {
     },
   },
   plugins: [],
-Propaganda: ['Propaganda', 'sans-serif']
 }
