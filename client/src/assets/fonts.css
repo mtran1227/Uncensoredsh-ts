@@ -1,13 +1,6 @@
 @font-face {
   font-family: 'Boldonse';
-  src: url('./Boldonse.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Propaganda';
-  src: url('./Propaganda_Regular.ttf') format('truetype');
+  src: url('Boldonse.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }

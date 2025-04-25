@@ -38,3 +38,25 @@ router.post('/login', async (req, res) => {
 });
 
 module.exports = router;
+// TEMP TEST ROUTE to insert a test user manually
+
+
+router.get('/add-test-user', async (req, res) => {
+  try {
+    const email = "test@example.com";
+    const password = "password123";
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const existingUser = await User.findOne({ email });
+    if (existingUser) return res.json({ message: "User already exists" });
+
+    const newUser = new User({ email, password: hashedPassword });
+    await newUser.save();
+
+    res.json({ message: '✅ Test user created', user: newUser });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});

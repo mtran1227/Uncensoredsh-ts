@@ -1,5 +1,7 @@
-// server.js
 require('dotenv').config();
+console.log('Connecting to MongoDB:', process.env.MONGODB_URI);
+
+
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
@@ -9,27 +11,27 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+// Connect to MongoDB
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('✅ MongoDB connected');
 
-const bathroomRoutes = require('./server/routes/bathrooms');
-app.use('/api/bathrooms', bathroomRoutes);
+    // ✅ Import routes AFTER connection
+    const bathroomRoutes = require('./server/routes/bathrooms');
+    const ratingRoutes = require('./server/routes/rating');
+    const authRoutes = require('./server/routes/auth');
 
-const ratingRoutes = require('./server/routes/rating');
-app.use('/api/ratings', ratingRoutes);
+    // ✅ Register routes
+    app.use('/api/bathrooms', bathroomRoutes);
+    app.use('/api/ratings', ratingRoutes);
+    app.use('/api/auth', authRoutes);
 
-const authRoutes = require('./server/routes/auth');
-app.use('/api/auth', authRoutes);
-
-
-// Connect to MongoDB using the new URI from .env
-mongoose.connect(process.env.MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
-
-// Start the server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Backend running on http://localhost:${PORT}`);
-});
+    // ✅ Start server AFTER successful DB connection
+    const PORT = process.env.PORT || 3000;
+    app.listen(PORT, () => {
+      console.log(`🚀 Backend running on http://localhost:${PORT}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err);
+  });
