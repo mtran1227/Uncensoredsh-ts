@@ -1,50 +1,11 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Uncensored Sh*ts</title>
-  <link rel="stylesheet" type="text/css" href="style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-<body style="margin: 0; font-family: 'Inter', sans-serif; background: white; height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-
-  <!-- Centered Logo -->
-  <div style="text-align: center; margin-bottom: 40px;">
-    <div style="background: #004DFF; display: inline-block; padding: 5px 10px; color: white; font-size: 20px; font-family: Inter;">UNCENSORED</div>
-    <div style="color: #004DFF; font-size: 48px; font-family: Inter; font-weight: 400;">SH*TS</div>
-  </div>
-
-  <!-- Centered Login Form -->
-  <div style="width: 300px;">
-    <div style="text-align: center; margin-bottom: 12px;">
-      <span style="color: #004DFF; font-size: 16px; font-weight: 600;">sign in </span>
-      <span style="color: #004DFF; font-size: 16px;">or</span>
-      <a href="createacc.html" style="color: #004DFF; font-size: 16px; font-family: Inter; font-weight: 600; line-height: 24px; text-decoration: underline;">create an account</a>
-    </div>
-
-    <form id="loginForm">
-      <input type="text" id="username" placeholder="Username" style="margin-bottom: 10px; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
-      <input type="password" id="password" placeholder="Password" style="margin-bottom: 10px; width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
-      <button type="submit" style="width: 100%; background-color: #004DFF; color: white; padding: 10px; border-radius: 8px; border: none;">Continue</button>
-    </form>
-  </div>
-
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', function (e) {
-      e.preventDefault();
-      const username = document.getElementById('username').value;
-      const password = document.getElementById('password').value;
-
-      if (username.trim() && password.trim()) {
-        window.location.href = "homescreen.html";
-      } else {
-        alert("Please enter both username and password.");
-      }
-    });
-  </script>
-
-</body>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Uncensored Sh*ts</title>
+  </head>
+  <body>
+    <div id="root"></div>
+  </body>
 </html>

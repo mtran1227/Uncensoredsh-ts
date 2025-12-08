@@ -1,5 +1,38 @@
+/* Disable URL processing so imported fonts don't get rewritten */
+@font-face {
+  font-family: 'Boldonse';
+  src: url('./assets/Boldonse.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import './assets/fonts.css';
 
+@layer base {
+  @font-face {
+    font-family: 'Propaganda';
+    src: url('./assets/PROPAGAN.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Vanguard CF';
+    src: url('./assets/Fontspring-DEMO-vanguardcf-extrabold.otf') format('opentype');
+    font-weight: 800;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Boldonse';
+    src: url('./assets/Boldonse.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+  }
+}
