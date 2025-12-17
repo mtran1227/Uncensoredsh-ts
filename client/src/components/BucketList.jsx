@@ -7,7 +7,7 @@ const BucketList = () => {
   const [bucketList, setBucketList] = useState([]);
   const [allBathrooms, setAllBathrooms] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [showAddModal, setShowAddModal] = useState(true);
+  const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
 
   const authHeaders = () => ({
@@ -110,7 +110,7 @@ const BucketList = () => {
         setLoading(false);
       });
 
-    // Fetch all bathrooms for search/add functionality
+    // Fetch all bathrooms for search/add functionality (only from database)
     fetch(`${API_URL}/bathrooms`)
       .then((res) => {
         if (!res.ok) {
@@ -120,7 +120,7 @@ const BucketList = () => {
       })
       .then((data) => {
         const bathrooms = Array.isArray(data) ? data : [];
-        console.log(`Loaded ${bathrooms.length} bathrooms for search`);
+        console.log(`Loaded ${bathrooms.length} bathrooms from database for search`);
         setAllBathrooms(bathrooms);
         if (bathrooms.length === 0) {
           console.warn("No bathrooms found in database. The search may not work until bathrooms are added.");
@@ -138,6 +138,8 @@ const BucketList = () => {
       return;
     }
     
+    console.log('Adding bathroom to bucket list:', bathroomId);
+    
     try {
       const response = await fetch(`${API_URL}/user/bucket/${bathroomId}`, {
         method: "POST",
@@ -150,6 +152,7 @@ const BucketList = () => {
       }
       
       const data = await response.json();
+      console.log('Successfully added to bucket list:', data);
       
       // Refresh bucket list immediately
       const refreshResponse = await fetch(`${API_URL}/user/bucket`, { 
@@ -234,17 +237,8 @@ const BucketList = () => {
     }
   };
 
-  // Combine API bathrooms with fallback for search
-  const allAvailableBathrooms = allBathrooms.length > 0 
-    ? allBathrooms 
-    : fallbackBucketList.map(b => ({
-        _id: b._id,
-        name: b.name,
-        location: b.location,
-        geoLocation: b.geoLocation,
-        averageRating: b.averageRating,
-        images: b.images
-      }));
+  // Use only bathrooms from database for search (fallback bathrooms can't be added via API)
+  const allAvailableBathrooms = allBathrooms;
 
   const filteredBathrooms = allAvailableBathrooms.filter((b) => {
     const q = searchTerm.trim().toLowerCase();
@@ -452,6 +446,7 @@ const BucketList = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };
