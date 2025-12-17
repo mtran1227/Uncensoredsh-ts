@@ -155,7 +155,7 @@ const BathroomProfile = () => {
       setReviews(r.data);
       setRating(0);
       setComment("");
-      setMessage("");
+      setMessage("Review submitted! This bathroom has been added to your history.");
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.error || "Submit failed");
@@ -367,18 +367,36 @@ const BathroomProfile = () => {
               
               // Check if this review belongs to the current user
               // Reviews can have userId as ObjectId, populated user object, or userEmail
-              const revUserId = rev.userId?._id || rev.userId;
-              const currentUserId = user?.id || user?._id;
+              let isMyReview = false;
               
-              // Multiple ways to match: by ID, email, or username
-              const isMyReview = user && (
-                (revUserId && currentUserId && revUserId.toString() === currentUserId.toString()) ||
-                (rev.userEmail && user.email && rev.userEmail.toLowerCase() === user.email.toLowerCase()) ||
-                (rev.userName && user.username && rev.userName.toLowerCase() === user.username.toLowerCase())
-              );
+              if (user) {
+                // Try matching by userId (ObjectId or populated object)
+                if (rev.userId) {
+                  const revUserId = rev.userId._id ? rev.userId._id.toString() : rev.userId.toString();
+                  const currentUserId = (user.id || user._id)?.toString();
+                  if (revUserId && currentUserId && revUserId === currentUserId) {
+                    isMyReview = true;
+                  }
+                }
+                
+                // Try matching by email
+                if (!isMyReview && rev.userEmail && user.email) {
+                  if (rev.userEmail.toLowerCase() === user.email.toLowerCase()) {
+                    isMyReview = true;
+                  }
+                }
+                
+                // Try matching by username
+                if (!isMyReview && rev.userName && user.username) {
+                  if (rev.userName.toLowerCase() === user.username.toLowerCase()) {
+                    isMyReview = true;
+                  }
+                }
+              }
               
-              // Only show profile photo for the current user's own reviews - explicitly set to null for others
-              const userProfilePhoto = isMyReview ? (rev.userId?.profilePhoto || rev.profilePhoto || user?.profilePhoto) : null;
+              // Only show profile photo for the current user's own reviews
+              // For all other reviews, explicitly set to null to show default avatar
+              const userProfilePhoto = isMyReview ? (rev.userId?.profilePhoto || user?.profilePhoto) : null;
               
               return (
                 <div key={rev._id} className="flex gap-3 items-start">

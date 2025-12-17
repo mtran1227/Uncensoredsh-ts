@@ -14,48 +14,86 @@ router.post('/', async (req, res) => {
     const mongoose = require('mongoose');
     const { bathroomId, userEmail, userId, userName, ratings, comment } = req.body;
 
-    // Convert bathroomId to ObjectId if it's a valid ObjectId string
-    let normalizedBathroomId = bathroomId;
+    // Find the actual bathroom to get its MongoDB _id
+    let actualBathroomId = null;
+    let actualBathroom = null;
+    
+    // Try to find by ObjectId first
     if (mongoose.Types.ObjectId.isValid(bathroomId)) {
-      normalizedBathroomId = mongoose.Types.ObjectId(bathroomId);
+      actualBathroom = await Bathroom.findById(bathroomId);
+      if (actualBathroom) {
+        actualBathroomId = actualBathroom._id;
+      }
+    }
+    
+    // If not found by ObjectId, try to find by name (for fallback string IDs)
+    if (!actualBathroomId) {
+      // Convert string ID like "bobst-library-ll1" to a name pattern
+      const namePattern = bathroomId
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase())
+        .replace(/\bll1\b/gi, 'LL1')
+        .replace(/\b(\d+)(st|nd|rd|th)\b/gi, '$1$2');
+      
+      actualBathroom = await Bathroom.findOne({ 
+        name: new RegExp(namePattern.replace(/\s+/g, '.*'), 'i') 
+      });
+      
+      if (actualBathroom) {
+        actualBathroomId = actualBathroom._id;
+      }
+    }
+    
+    // If still not found, use the provided bathroomId (might be a string ID for fallback)
+    if (!actualBathroomId) {
+      actualBathroomId = mongoose.Types.ObjectId.isValid(bathroomId) 
+        ? mongoose.Types.ObjectId(bathroomId) 
+        : bathroomId;
     }
 
     // Upsert = Create new OR update existing rating from same user
     const rating = await Rating.findOneAndUpdate(
-      { bathroomId: normalizedBathroomId, userEmail },
-      { bathroomId: normalizedBathroomId, userEmail, userId, userName, ratings, comment },
+      { bathroomId: actualBathroomId, userEmail },
+      { bathroomId: actualBathroomId, userEmail, userId, userName, ratings, comment },
       { new: true, upsert: true, runValidators: true, setDefaultsOnInsert: true }
     );
 
     // track visited
     await User.findByIdAndUpdate(
       userId,
-      { $addToSet: { visitedBathrooms: normalizedBathroomId } }
+      { $addToSet: { visitedBathrooms: actualBathroomId } }
     );
 
     // Add to favorites (history) when user reviews a bathroom
     const user = await User.findById(userId);
-    if (user) {
-      const isInFavorites = user.favorites.some(id => id.toString() === normalizedBathroomId.toString());
-      if (!isInFavorites) {
-        // Remove from bucketlist if it's there (to prevent overlap)
-        const wasInBucketList = user.bucketList.some(id => id.toString() === normalizedBathroomId.toString());
-        if (wasInBucketList) {
-          user.bucketList = user.bucketList.filter(id => id.toString() !== normalizedBathroomId.toString());
-          user.bucketListCount = user.bucketList.length;
+    if (user && actualBathroomId) {
+      // Only add ObjectIds to favorites (skip string IDs that don't exist in DB)
+      if (mongoose.Types.ObjectId.isValid(actualBathroomId)) {
+        const isInFavorites = user.favorites.some(id => id.toString() === actualBathroomId.toString());
+        if (!isInFavorites) {
+          // Remove from bucketlist if it's there (to prevent overlap)
+          const wasInBucketList = user.bucketList.some(id => id.toString() === actualBathroomId.toString());
+          if (wasInBucketList) {
+            user.bucketList = user.bucketList.filter(id => id.toString() !== actualBathroomId.toString());
+            user.bucketListCount = user.bucketList.length;
+          }
+          // Add to favorites (history)
+          user.favorites.push(actualBathroomId);
+          user.shitInCount = user.favorites.length;
+          await user.save();
+        } else {
+          // Even if already in favorites, ensure shitInCount is synced
+          user.shitInCount = user.favorites.length;
+          await user.save();
         }
-        // Add to favorites (history)
-        user.favorites.push(normalizedBathroomId);
-        user.shitInCount = user.favorites.length;
-        await user.save();
       }
     }
 
     // ------------------------------------------------------
     // Recalculate bathroom average rating (blend hardcoded with user ratings)
     // ------------------------------------------------------
-    const bathroom = await Bathroom.findById(normalizedBathroomId);
-    const allRatings = await Rating.find({ bathroomId: normalizedBathroomId });
+    const bathroom = await Bathroom.findById(actualBathroomId);
+    const allRatings = await Rating.find({ bathroomId: actualBathroomId });
 
     // Get the original/hardcoded average (from seed data or initial value)
     const hardcodedAverage = bathroom.averageRating || 0;
@@ -69,23 +107,23 @@ router.post('/', async (req, res) => {
       // Blend: (hardcoded * weight + user ratings) / (weight + user count)
       const blendedAvg = (hardcodedAverage * hardcodedWeight + userRatingsSum) / (hardcodedWeight + allRatings.length);
       
-      await Bathroom.findByIdAndUpdate(normalizedBathroomId, { averageRating: blendedAvg });
+      await Bathroom.findByIdAndUpdate(actualBathroomId, { averageRating: blendedAvg });
     } else {
       // If no user ratings yet, keep the hardcoded average
-      await Bathroom.findByIdAndUpdate(normalizedBathroomId, { averageRating: hardcodedAverage });
+      await Bathroom.findByIdAndUpdate(actualBathroomId, { averageRating: hardcodedAverage });
     }
 
     // ------------------------------------------------------
     // LOG VISITED BATHROOM FOR GOOGLE MAPS
     // ------------------------------------------------------
-    const bathroomForMap = await Bathroom.findById(normalizedBathroomId);
+    const bathroomForMap = await Bathroom.findById(actualBathroomId);
 
     if (bathroomForMap && bathroomForMap.geoLocation && bathroomForMap.geoLocation.coordinates) {
       await VisitedBathroom.findOneAndUpdate(
-        { userId, bathroomId: normalizedBathroomId },
+        { userId, bathroomId: actualBathroomId },
         {
           userId,
-          bathroomId: normalizedBathroomId,
+          bathroomId: actualBathroomId,
           geoLocation: {
             type: "Point",
             coordinates: bathroomForMap.geoLocation.coordinates
