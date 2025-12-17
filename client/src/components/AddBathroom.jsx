@@ -53,7 +53,7 @@ const AddBathroom = ({ onClose, onBathroomAdded }) => {
       
       // If it's a location validation error, provide helpful guidance
       if (errorMessage.includes('NYU campus location')) {
-        setError(`${errorMessage}\n\n💡 Make sure your coordinates are within NYU campus boundaries:\n• Washington Square area: lat 40.725-40.735, lng -74.002 to -73.990\n• Brooklyn MetroTech: lat 40.690-40.697, lng -73.990 to -73.980`);
+        setError(`${errorMessage}\n\n💡 NYU locations include:\n• NYC: Washington Square, Brooklyn MetroTech\n• Study Abroad: Abu Dhabi, Shanghai, Buenos Aires, Florence, London, Madrid, Paris, Prague, Sydney, Tel Aviv, Washington DC, Accra, Berlin`);
       }
     }
   };
@@ -77,9 +77,9 @@ const AddBathroom = ({ onClose, onBathroomAdded }) => {
           </div>
         )}
 
-        <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-          <p className="text-sm text-yellow-800">
-            <strong>📍 NYU Locations Only:</strong> Only bathrooms at NYU campus locations (Washington Square or Brooklyn MetroTech) can be added.
+        <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+          <p className="text-sm text-blue-800">
+            <strong>📍 NYU Locations Only:</strong> Only bathrooms at NYU campus locations can be added.
           </p>
         </div>
 
