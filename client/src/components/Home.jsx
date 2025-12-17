@@ -147,8 +147,13 @@ const Home = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       // Convert to same format as visitedBathrooms for consistency
+      // Include both ID and name for better matching
       const favorites = res.data || [];
-      setVisitedBathrooms(favorites.map(f => ({ bathroomId: f._id || f })));
+      setVisitedBathrooms(favorites.map(f => ({ 
+        bathroomId: f._id || f,
+        _id: f._id || f,
+        name: f.name
+      })));
     } catch (err) {
       console.error("Error loading visited pins:", err);
     }
@@ -259,18 +264,24 @@ const Home = () => {
   // Helper function to check if a bathroom is visited (by ID or name)
   // Priority: visited bathrooms should show as white pins
   const isVisited = (bathroom) => {
-    if (!bathroom) return false;
+    if (!bathroom || visitedBathrooms.length === 0) return false;
     const normalizedId = normalizeId(bathroom._id);
     const normalizedName = normalizeName(bathroom.name);
     
     return visitedBathrooms.some((v) => {
-      const visitedBathroom = v.bathroomId || v;
-      const visitedId = normalizeId(visitedBathroom?._id || visitedBathroom);
-      const visitedName = normalizeName(visitedBathroom?.name);
+      // Handle different structures: v.bathroomId, v._id, or v itself
+      const visitedBathroom = v.bathroomId || v._id || v;
+      const visitedId = normalizeId(typeof visitedBathroom === 'object' ? visitedBathroom._id : visitedBathroom);
+      const visitedName = normalizeName(v.name || (typeof visitedBathroom === 'object' ? visitedBathroom.name : ''));
       
-      // Match by ID or name (exact match to avoid false positives)
-      return (normalizedId && visitedId && normalizedId === visitedId) || 
-             (normalizedName && visitedName && normalizedName === visitedName);
+      // Match by ID first (most reliable), then by name
+      if (normalizedId && visitedId && normalizedId === visitedId) {
+        return true;
+      }
+      if (normalizedName && visitedName && normalizedName === visitedName) {
+        return true;
+      }
+      return false;
     });
   };
 
