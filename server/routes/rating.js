@@ -51,25 +51,6 @@ router.post('/', async (req, res) => {
         : bathroomId;
     }
 
-    // Check if user has this bathroom in their history (favorites) before allowing review
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ error: "User not found" });
-    }
-
-    // Check if bathroom is in user's favorites (history)
-    const isInHistory = user.favorites.some(id => {
-      const favId = id.toString();
-      const bathroomIdStr = actualBathroomId.toString();
-      return favId === bathroomIdStr;
-    });
-
-    if (!isInHistory) {
-      return res.status(403).json({ 
-        error: "You can only review bathrooms that are in your history. Please add this bathroom to your history first." 
-      });
-    }
-
     // Upsert = Create new OR update existing rating from same user
     const rating = await Rating.findOneAndUpdate(
       { bathroomId: actualBathroomId, userEmail },
@@ -83,7 +64,8 @@ router.post('/', async (req, res) => {
       { $addToSet: { visitedBathrooms: actualBathroomId } }
     );
 
-    // Add to favorites (history) when user reviews a bathroom (already checked above, but ensure it's added)
+    // Add to favorites (history) when user reviews a bathroom
+    const user = await User.findById(userId);
     if (user && actualBathroomId) {
       // Only add ObjectIds to favorites (skip string IDs that don't exist in DB)
       if (mongoose.Types.ObjectId.isValid(actualBathroomId)) {

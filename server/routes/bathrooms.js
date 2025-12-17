@@ -3,7 +3,7 @@ const router = express.Router();
 const Bathroom = require('../models/Bathroom');
 const User = require('../models/User');
 
-// NYU Campus boundaries (Greenwich Village + Brooklyn campuses)
+// NYU Campus boundaries (NYC + Study Abroad locations)
 const NYU_BOUNDARIES = {
   // Main Washington Square Campus
   washingtonSquare: {
@@ -18,11 +18,103 @@ const NYU_BOUNDARIES = {
     maxLat: 40.697,
     minLng: -73.990,
     maxLng: -73.980
+  },
+  // NYU Abu Dhabi, UAE
+  abuDhabi: {
+    minLat: 24.45,
+    maxLat: 24.55,
+    minLng: 54.35,
+    maxLng: 54.45
+  },
+  // NYU Shanghai, China
+  shanghai: {
+    minLat: 31.20,
+    maxLat: 31.25,
+    minLng: 121.45,
+    maxLng: 121.50
+  },
+  // NYU Buenos Aires, Argentina
+  buenosAires: {
+    minLat: -34.62,
+    maxLat: -34.58,
+    minLng: -58.42,
+    maxLng: -58.38
+  },
+  // NYU Florence, Italy
+  florence: {
+    minLat: 43.76,
+    maxLat: 43.78,
+    minLng: 11.25,
+    maxLng: 11.27
+  },
+  // NYU London, UK
+  london: {
+    minLat: 51.50,
+    maxLat: 51.52,
+    minLng: -0.13,
+    maxLng: -0.11
+  },
+  // NYU Madrid, Spain
+  madrid: {
+    minLat: 40.42,
+    maxLat: 40.44,
+    minLng: -3.72,
+    maxLng: -3.70
+  },
+  // NYU Paris, France
+  paris: {
+    minLat: 48.84,
+    maxLat: 48.86,
+    minLng: 2.32,
+    maxLng: 2.34
+  },
+  // NYU Prague, Czech Republic
+  prague: {
+    minLat: 50.08,
+    maxLat: 50.10,
+    minLng: 14.40,
+    maxLng: 14.42
+  },
+  // NYU Sydney, Australia
+  sydney: {
+    minLat: -33.88,
+    maxLat: -33.86,
+    minLng: 151.20,
+    maxLng: 151.22
+  },
+  // NYU Tel Aviv, Israel
+  telAviv: {
+    minLat: 32.08,
+    maxLat: 32.10,
+    minLng: 34.78,
+    maxLng: 34.80
+  },
+  // NYU Washington DC
+  washingtonDC: {
+    minLat: 38.90,
+    maxLat: 38.92,
+    minLng: -77.05,
+    maxLng: -77.03
+  },
+  // NYU Accra, Ghana
+  accra: {
+    minLat: 5.55,
+    maxLat: 5.57,
+    minLng: -0.20,
+    maxLng: -0.18
+  },
+  // NYU Berlin, Germany
+  berlin: {
+    minLat: 52.50,
+    maxLat: 52.52,
+    minLng: 13.38,
+    maxLng: 13.40
   }
 };
 
-// Known NYU building keywords
+// Known NYU building keywords (NYC + Study Abroad)
 const NYU_KEYWORDS = [
+  // NYC campuses
   'bobst', 'kimmel', 'tisch', 'stern', 'silver', 'palladium', 
   'metrotech', 'washington square', 'nyu', 'new york university',
   'courant', 'gcasl', 'steinhardt', 'gallatin', 'law', 'vanderbilt',
@@ -30,11 +122,25 @@ const NYU_KEYWORDS = [
   'studentlink', 'founders', 'brittany', 'goddard', 'lipton',
   'third north', 'university hall', 'carlyle', 'greenwich', 'rubin',
   'weinstein', 'clark street', 'jacobs', 'rogers', '370 jay',
-  'dibner', 'makerspace', 'urban future lab', 'othmer'
+  'dibner', 'makerspace', 'urban future lab', 'othmer',
+  // Study abroad locations
+  'nyu abu dhabi', 'nyu ad', 'abu dhabi',
+  'nyu shanghai', 'nyu sh',
+  'nyu buenos aires', 'nyu ba',
+  'nyu florence', 'nyu florence villa ulivi', 'villa ulivi',
+  'nyu london', 'nyu bedford square',
+  'nyu madrid', 'nyu madrid campus',
+  'nyu paris', 'nyu paris campus',
+  'nyu prague', 'nyu prague campus',
+  'nyu sydney', 'nyu sydney campus',
+  'nyu tel aviv', 'nyu ta',
+  'nyu washington dc', 'nyu dc',
+  'nyu accra', 'nyu ghana',
+  'nyu berlin', 'nyu berlin campus'
 ];
 
 /**
- * Validates if a location is within NYU campus boundaries
+ * Validates if a location is within NYU campus boundaries (NYC + Study Abroad)
  * @param {number} lat - Latitude
  * @param {number} lng - Longitude
  * @param {string} address - Address string
@@ -42,22 +148,17 @@ const NYU_KEYWORDS = [
  * @returns {boolean} - True if location is valid NYU location
  */
 function isValidNYULocation(lat, lng, address = '', name = '') {
-  // Check coordinates against boundaries
-  const inWashingtonSquare = 
-    lat >= NYU_BOUNDARIES.washingtonSquare.minLat &&
-    lat <= NYU_BOUNDARIES.washingtonSquare.maxLat &&
-    lng >= NYU_BOUNDARIES.washingtonSquare.minLng &&
-    lng <= NYU_BOUNDARIES.washingtonSquare.maxLng;
-  
-  const inBrooklyn = 
-    lat >= NYU_BOUNDARIES.brooklyn.minLat &&
-    lat <= NYU_BOUNDARIES.brooklyn.maxLat &&
-    lng >= NYU_BOUNDARIES.brooklyn.minLng &&
-    lng <= NYU_BOUNDARIES.brooklyn.maxLng;
-  
-  // Check if coordinates are within boundaries
-  if (inWashingtonSquare || inBrooklyn) {
-    return true;
+  // Check coordinates against all NYU campus boundaries
+  for (const [campusName, boundary] of Object.entries(NYU_BOUNDARIES)) {
+    const inBoundary = 
+      lat >= boundary.minLat &&
+      lat <= boundary.maxLat &&
+      lng >= boundary.minLng &&
+      lng <= boundary.maxLng;
+    
+    if (inBoundary) {
+      return true;
+    }
   }
   
   // Fallback: Check address/name for NYU keywords (case-insensitive)
@@ -150,7 +251,7 @@ router.post('/', async (req, res) => {
       
       if (!isValidNYULocation(lat, lng, address, bathroomName)) {
         return res.status(403).json({ 
-          error: 'Bathroom must be located at an NYU campus location. Please ensure the coordinates are within NYU campus boundaries (Washington Square or Brooklyn MetroTech areas).' 
+          error: 'Bathroom must be located at an NYU campus location (NYC or study abroad). Please ensure the coordinates are within NYU campus boundaries.' 
         });
       }
     } else {
@@ -164,7 +265,7 @@ router.post('/', async (req, res) => {
       
       if (!hasNYUKeyword) {
         return res.status(403).json({ 
-          error: 'Bathroom must be located at an NYU campus location. Please provide valid coordinates or an NYU building address.' 
+          error: 'Bathroom must be located at an NYU campus location (NYC or study abroad). Please provide valid coordinates or an NYU building address.' 
         });
       }
     }

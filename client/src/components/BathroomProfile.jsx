@@ -126,7 +126,10 @@ const BathroomProfile = () => {
           axios.get(`${API_URL}/ratings/bathroom/${id}`),
         ]);
         setBathroom(b.data);
-        setReviews(r.data);
+        // Ensure reviews is always an array
+        const reviewsData = Array.isArray(r.data) ? r.data : [];
+        setReviews(reviewsData);
+        console.log('📝 Reviews fetched:', reviewsData.length, reviewsData);
         
         // Preload user's existing review if they have one and bathroom is in their history
         if (user && token) {
@@ -161,9 +164,12 @@ const BathroomProfile = () => {
                      (favName && bathroomName && favName === bathroomName);
             });
             
+            console.log('🔍 Checking if bathroom is in history:', isInHistory, 'Reviews count:', reviewsData.length);
+            
             // If bathroom is in history, find and preload user's review
-            if (isInHistory && r.data && Array.isArray(r.data)) {
-              const myReview = r.data.find(rev => {
+            if (isInHistory && reviewsData && Array.isArray(reviewsData) && reviewsData.length > 0) {
+              console.log('✅ Bathroom is in history, looking for user review...', 'User:', user.username || user.email);
+              const myReview = reviewsData.find(rev => {
                 // Match by userId
                 if (rev.userId) {
                   const revUserId = rev.userId._id ? rev.userId._id.toString() : rev.userId.toString();
@@ -185,8 +191,11 @@ const BathroomProfile = () => {
               
               // Preload the review into the form
               if (myReview) {
+                console.log('✅ Found user review, preloading:', myReview);
                 setRating(myReview.ratings?.overall || 0);
                 setComment(myReview.comment || "");
+              } else {
+                console.log('⚠️ No review found for user in reviews list');
               }
             }
           } catch (err) {
