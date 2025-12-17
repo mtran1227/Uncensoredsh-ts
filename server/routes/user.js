@@ -101,7 +101,7 @@ router.post("/uploadPhoto", auth, async (req, res) => {
 // ----------------------------
 router.get("/favorites", auth, async (req, res) => {
   const user = await User.findById(req.user.userId)
-    .populate("favorites", "name geoLocation averageRating");
+    .populate("favorites", "name geoLocation averageRating images location");
   res.json(user?.favorites || []);
 });
 
@@ -126,7 +126,7 @@ router.post("/favorites/:bathroomId", auth, async (req, res) => {
     user.shitInCount = user.favorites.length;
   }
   await user.save();
-  const populated = await user.populate("favorites", "name geoLocation averageRating");
+  const populated = await user.populate("favorites", "name geoLocation averageRating images location");
   res.json({ favorites: populated.favorites });
 });
 
@@ -135,7 +135,7 @@ router.post("/favorites/:bathroomId", auth, async (req, res) => {
 // ----------------------------
 router.get("/bucket", auth, async (req, res) => {
   const user = await User.findById(req.user.userId)
-    .populate("bucketList", "name geoLocation averageRating");
+    .populate("bucketList", "name geoLocation averageRating images location");
   res.json(user?.bucketList || []);
 });
 
@@ -159,7 +159,7 @@ router.post("/bucket/:bathroomId", auth, async (req, res) => {
   }
   user.bucketListCount = user.bucketList.length;
   await user.save();
-  const populated = await user.populate("bucketList", "name geoLocation averageRating");
+  const populated = await user.populate("bucketList", "name geoLocation averageRating images location");
   res.json({ bucketList: populated.bucketList });
 });
 

@@ -154,9 +154,20 @@ const BucketList = () => {
     });
   };
 
-  const renderCardImage = (item) =>
-    item?.images?.[0]?.url ||
-    "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80";
+  const renderCardImage = (item) => {
+    // Handle both API response structure and fallback structure
+    const imageUrl = item?.images?.[0]?.url || item?.images?.[0];
+    if (imageUrl) {
+      // If it's already a full URL, return it; otherwise prepend / if it starts with bathroomphotos
+      if (imageUrl.startsWith('http')) {
+        return imageUrl;
+      }
+      // Ensure it starts with / for relative paths
+      return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
+    }
+    // Fallback to a bathroom placeholder image instead of bedroom
+    return "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80";
+  };
 
   return (
     <div className="p-8 max-w-6xl mx-auto bg-white">
