@@ -53,11 +53,23 @@ const BathroomProfile = () => {
   const fallbackBathrooms = {
     "silver-center": { _id: "silver-center", name: "Silver Center", location: "100 Washington Square E", geoLocation: { address: "100 Washington Square E" }, averageRating: 0 },
     "kimmel-center": { _id: "kimmel-center", name: "Kimmel Center for University Life", location: "60 Washington Sq S", geoLocation: { address: "60 Washington Sq S" }, averageRating: 0 },
+    "kimmel-center-2f": { _id: "kimmel-center-2f", name: "Kimmel Center 2nd Floor", location: "60 Washington Square S", geoLocation: { address: "60 Washington Square S" }, averageRating: 4.0, images: [{ url: "/bathroomphotos/kimmel2nd.png" }] },
     "courant-warren-weaver": { _id: "courant-warren-weaver", name: "Warren Weaver Hall (Courant Institute)", location: "251 Mercer St", geoLocation: { address: "251 Mercer St" }, averageRating: 0 },
     "brown-building": { _id: "brown-building", name: "Brown Building", location: "29 Washington Pl", geoLocation: { address: "29 Washington Pl" }, averageRating: 0 },
     "gcasl": { _id: "gcasl", name: "GCASL", location: "238 Thompson St", geoLocation: { address: "238 Thompson St" }, averageRating: 0 },
     "king-juan-carlos": { _id: "king-juan-carlos", name: "King Juan Carlos I Center", location: "53 Washington Sq S", geoLocation: { address: "53 Washington Sq S" }, averageRating: 0 },
     "bobst-library": { _id: "bobst-library", name: "Bobst Library", location: "70 Washington Sq S", geoLocation: { address: "70 Washington Sq S" }, averageRating: 0, images: [{ url: "/bathroomphotos/bobst4th.png" }] },
+    "bobst-library-4f": { _id: "bobst-library-4f", name: "Bobst Library 4th Floor", location: "70 Washington Square S", geoLocation: { address: "70 Washington Square S" }, averageRating: 3.5, images: [{ url: "/bathroomphotos/bobst4th.png" }] },
+    "bobst-ll1": { _id: "bobst-ll1", name: "Bobst Library LL1", location: "70 Washington Square S", geoLocation: { address: "70 Washington Square S" }, averageRating: 3.6, images: [{ url: "/bathroomphotos/bobstll1.png" }] },
+    "bobst-2nd": { _id: "bobst-2nd", name: "Bobst Library 2nd Floor", location: "70 Washington Square S", geoLocation: { address: "70 Washington Square S" }, averageRating: 3.7, images: [{ url: "/bathroomphotos/bobst2nd.png" }] },
+    "bobst-5th": { _id: "bobst-5th", name: "Bobst Library 5th Floor", location: "70 Washington Square S", geoLocation: { address: "70 Washington Square S" }, averageRating: 3.9, images: [{ url: "/bathroomphotos/bobst5th.png" }] },
+    "bobst-7th": { _id: "bobst-7th", name: "Bobst Library 7th Floor", location: "70 Washington Square S", geoLocation: { address: "70 Washington Square S" }, averageRating: 4.1, images: [{ url: "/bathroomphotos/bobst7th.png" }] },
+    "palladium-2f": { _id: "palladium-2f", name: "Palladium 2nd Floor", location: "140 E 14th St", geoLocation: { address: "140 E 14th St" }, averageRating: 4.2, images: [{ url: "/bathroomphotos/palladium2nd.png" }] },
+    "metrotech-8f": { _id: "metrotech-8f", name: "2 MetroTech 8th Floor", location: "2 MetroTech Center", geoLocation: { address: "2 MetroTech Center" }, averageRating: 4.9, images: [{ url: "/bathroomphotos/2metrotech8thfloor.png" }] },
+    "kimmel-8th": { _id: "kimmel-8th", name: "Kimmel Center 8th Floor", location: "60 Washington Square S", geoLocation: { address: "60 Washington Square S" }, averageRating: 4.3, images: [{ url: "/bathroomphotos/kimmel8th.png" }] },
+    "stern-4th": { _id: "stern-4th", name: "Stern 4th Floor", location: "44 W 4th St", geoLocation: { address: "44 W 4th St" }, averageRating: 3.8, images: [{ url: "/bathroomphotos/stern4th.png" }] },
+    "studentlink": { _id: "studentlink", name: "StudentLink Center", location: "383 Lafayette St", geoLocation: { address: "383 Lafayette St" }, averageRating: 3.7, images: [{ url: "/bathroomphotos/studentlink.png" }] },
+    "silver-center-6f": { _id: "silver-center-6f", name: "Silver Center 6th Floor", location: "100 Washington Square E", geoLocation: { address: "100 Washington Square E" }, averageRating: 3.8, images: [{ url: "/bathroomphotos/silvercenter.png" }] },
     "steinhardt-education": { _id: "steinhardt-education", name: "Steinhardt Education Building", location: "35 W 4th St", geoLocation: { address: "35 W 4th St" }, averageRating: 0 },
     "steinhardt-pless": { _id: "steinhardt-pless", name: "Steinhardt Pless Hall", location: "82 Washington Square E", geoLocation: { address: "82 Washington Square E" }, averageRating: 0 },
     "vanderbilt-hall": { _id: "vanderbilt-hall", name: "Vanderbilt Hall (NYU Law)", location: "40 Washington Sq S", geoLocation: { address: "40 Washington Sq S" }, averageRating: 0 },
@@ -183,8 +195,13 @@ const BathroomProfile = () => {
         }
       } catch (err) {
         console.error("Fetch error", err);
+        // Try fallback bathroom
         if (fallbackBathrooms[id]) {
           setBathroom(fallbackBathrooms[id]);
+          setReviews([]);
+        } else {
+          // If not found in fallback, still set loading to false so error message shows
+          setBathroom(null);
           setReviews([]);
         }
       } finally {
