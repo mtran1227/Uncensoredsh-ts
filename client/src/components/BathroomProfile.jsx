@@ -198,7 +198,61 @@ const BathroomProfile = () => {
         // Try fallback bathroom
         if (fallbackBathrooms[id]) {
           setBathroom(fallbackBathrooms[id]);
-          setReviews([]);
+          // Still try to fetch reviews even for fallback bathrooms
+          try {
+            const reviewsRes = await axios.get(`${API_URL}/ratings/bathroom/${id}`);
+            setReviews(reviewsRes.data || []);
+            
+            // Preload user's review if bathroom is in history
+            if (user && token && reviewsRes.data && Array.isArray(reviewsRes.data)) {
+              try {
+                const favoritesRes = await axios.get(`${API_URL}/user/favorites`, {
+                  headers: authHeaders
+                });
+                const favorites = favoritesRes.data || [];
+                const normalizeId = (id) => {
+                  if (!id) return null;
+                  if (typeof id === 'string') return id.toLowerCase().trim();
+                  if (id._id) return id._id.toString().toLowerCase().trim();
+                  if (id.toString) return id.toString().toLowerCase().trim();
+                  return null;
+                };
+                const normalizeName = (name) => {
+                  if (!name) return '';
+                  return name.toLowerCase().trim().replace(/\s+/g, ' ');
+                };
+                const isInHistory = favorites.some(fav => {
+                  const favId = normalizeId(fav._id || fav);
+                  const bathroomIdStr = normalizeId(id);
+                  const favName = normalizeName(fav.name);
+                  const bathroomName = normalizeName(fallbackBathrooms[id]?.name);
+                  return (favId && bathroomIdStr && favId === bathroomIdStr) ||
+                         (favName && bathroomName && favName === bathroomName);
+                });
+                if (isInHistory) {
+                  const myReview = reviewsRes.data.find(rev => {
+                    if (rev.userId) {
+                      const revUserId = rev.userId._id ? rev.userId._id.toString() : rev.userId.toString();
+                      const currentUserId = (user.id || user._id)?.toString();
+                      if (revUserId && currentUserId && revUserId === currentUserId) return true;
+                    }
+                    if (rev.userEmail && user.email && rev.userEmail.toLowerCase() === user.email.toLowerCase()) return true;
+                    if (rev.userName && user.username && rev.userName.toLowerCase() === user.username.toLowerCase()) return true;
+                    return false;
+                  });
+                  if (myReview) {
+                    setRating(myReview.ratings?.overall || 0);
+                    setComment(myReview.comment || "");
+                  }
+                }
+              } catch (err) {
+                console.error("Error checking history for fallback:", err);
+              }
+            }
+          } catch (reviewErr) {
+            console.error("Error fetching reviews for fallback bathroom:", reviewErr);
+            setReviews([]);
+          }
         } else {
           // If not found in fallback, still set loading to false so error message shows
           setBathroom(null);
