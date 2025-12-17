@@ -17,6 +17,8 @@ const BathroomProfile = () => {
   const [comment, setComment] = useState("");
   const [photos, setPhotos] = useState([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
+  const [isInHistory, setIsInHistory] = useState(false);
+  const [checkingHistory, setCheckingHistory] = useState(true);
   const user = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
 
@@ -115,18 +117,62 @@ const BathroomProfile = () => {
         ]);
         setBathroom(b.data);
         setReviews(r.data);
+        
+        // Check if bathroom is in user's history (favorites)
+        if (user && token) {
+          try {
+            const favoritesRes = await axios.get(`${API_URL}/user/favorites`, {
+              headers: authHeaders
+            });
+            const favorites = favoritesRes.data || [];
+            const bathroomId = b.data?._id || id;
+            
+            // Check if this bathroom is in favorites by ID or name
+            const normalizeId = (id) => {
+              if (!id) return null;
+              if (typeof id === 'string') return id.toLowerCase().trim();
+              if (id._id) return id._id.toString().toLowerCase().trim();
+              if (id.toString) return id.toString().toLowerCase().trim();
+              return null;
+            };
+            
+            const normalizeName = (name) => {
+              if (!name) return '';
+              return name.toLowerCase().trim().replace(/\s+/g, ' ');
+            };
+            
+            const isInFavorites = favorites.some(fav => {
+              const favId = normalizeId(fav._id || fav);
+              const bathroomIdStr = normalizeId(bathroomId);
+              const favName = normalizeName(fav.name);
+              const bathroomName = normalizeName(b.data?.name);
+              
+              return (favId && bathroomIdStr && favId === bathroomIdStr) ||
+                     (favName && bathroomName && favName === bathroomName);
+            });
+            
+            setIsInHistory(isInFavorites);
+          } catch (err) {
+            console.error("Error checking history:", err);
+            setIsInHistory(false);
+          }
+        } else {
+          setIsInHistory(false);
+        }
       } catch (err) {
         console.error("Fetch error", err);
         if (fallbackBathrooms[id]) {
           setBathroom(fallbackBathrooms[id]);
           setReviews([]);
         }
+        setIsInHistory(false);
       } finally {
         setLoading(false);
+        setCheckingHistory(false);
       }
     };
     fetchData();
-  }, [id]);
+  }, [id, user, token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -156,9 +202,46 @@ const BathroomProfile = () => {
       setRating(0);
       setComment("");
       setMessage("Review submitted! This bathroom has been added to your history.");
+      // Refresh history check
+      if (user && token) {
+        try {
+          const favoritesRes = await axios.get(`${API_URL}/user/favorites`, {
+            headers: authHeaders
+          });
+          const favorites = favoritesRes.data || [];
+          const bathroomId = bathroom?._id || id;
+          const normalizeId = (id) => {
+            if (!id) return null;
+            if (typeof id === 'string') return id.toLowerCase().trim();
+            if (id._id) return id._id.toString().toLowerCase().trim();
+            if (id.toString) return id.toString().toLowerCase().trim();
+            return null;
+          };
+          const normalizeName = (name) => {
+            if (!name) return '';
+            return name.toLowerCase().trim().replace(/\s+/g, ' ');
+          };
+          const isInFavorites = favorites.some(fav => {
+            const favId = normalizeId(fav._id || fav);
+            const bathroomIdStr = normalizeId(bathroomId);
+            const favName = normalizeName(fav.name);
+            const bathroomName = normalizeName(bathroom?.name);
+            return (favId && bathroomIdStr && favId === bathroomIdStr) ||
+                   (favName && bathroomName && favName === bathroomName);
+          });
+          setIsInHistory(isInFavorites);
+        } catch (err) {
+          console.error("Error refreshing history check:", err);
+        }
+      }
     } catch (err) {
       console.error(err);
-      alert(err.response?.data?.error || "Submit failed");
+      const errorMsg = err.response?.data?.error || "Submit failed";
+      alert(errorMsg);
+      // If error is about not being in history, update state
+      if (errorMsg.includes("history")) {
+        setIsInHistory(false);
+      }
     } finally {
       setSaving(false);
     }
@@ -280,79 +363,94 @@ const BathroomProfile = () => {
           {/* Rating form */}
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
             <h3 className="text-blue-600 font-propaganda text-2xl mb-2 text-center">Been here?</h3>
-            <p className="text-gray-700 mb-3 text-center">Give your own rating:</p>
-            <RatingStars value={rating} onChange={(val) => setRating(val)} />
-
-            <form onSubmit={handleSubmit} className="mt-4 space-y-3">
-              <input
-                type="text"
-                placeholder="Write your review..."
-                value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded"
-              />
-              
-              {/* Photo Upload Button */}
-              <div className="flex items-center gap-3">
-                <label className="cursor-pointer">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={(e) => {
-                      const files = Array.from(e.target.files);
-                      setPhotos(files);
-                      setUploadingPhotos(files.length > 0);
-                    }}
-                    className="hidden"
-                  />
-                  <div className="flex items-center gap-2">
-                    <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-2xl font-bold">+</span>
-                    </div>
-                    <span className="text-blue-600 font-propaganda font-bold">
-                      {uploadingPhotos ? `UPLOADING PHOTOS (${photos.length})` : "UPLOADING PHOTOS"}
-                    </span>
-                  </div>
-                </label>
+            {!user ? (
+              <p className="text-gray-700 mb-3 text-center">Please sign in to leave a review.</p>
+            ) : checkingHistory ? (
+              <p className="text-gray-700 mb-3 text-center">Checking...</p>
+            ) : !isInHistory ? (
+              <div className="mb-3">
+                <p className="text-red-600 mb-2 text-center font-bold">You can only review bathrooms in your history.</p>
+                <p className="text-gray-700 text-sm text-center">Add this bathroom to your history first to leave a review.</p>
               </div>
+            ) : (
+              <p className="text-gray-700 mb-3 text-center">Give your own rating:</p>
+            )}
+            {isInHistory && user && (
+              <RatingStars value={rating} onChange={(val) => setRating(val)} />
+            )}
 
-              {/* Display selected photos */}
-              {photos.length > 0 && (
-                <div className="flex gap-2 flex-wrap">
-                  {photos.map((photo, index) => (
-                    <div key={index} className="relative">
-                      <img
-                        src={URL.createObjectURL(photo)}
-                        alt={`Preview ${index + 1}`}
-                        className="w-20 h-20 object-cover rounded border border-gray-300"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const newPhotos = photos.filter((_, i) => i !== index);
-                          setPhotos(newPhotos);
-                          setUploadingPhotos(newPhotos.length > 0);
-                        }}
-                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
-                      >
-                        ×
-                      </button>
+            {isInHistory && user && (
+              <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+                <input
+                  type="text"
+                  placeholder="Write your review..."
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded"
+                />
+                
+                {/* Photo Upload Button */}
+                <div className="flex items-center gap-3">
+                  <label className="cursor-pointer">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files);
+                        setPhotos(files);
+                        setUploadingPhotos(files.length > 0);
+                      }}
+                      className="hidden"
+                    />
+                    <div className="flex items-center gap-2">
+                      <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                        <span className="text-white text-2xl font-bold">+</span>
+                      </div>
+                      <span className="text-blue-600 font-propaganda font-bold">
+                        {uploadingPhotos ? `UPLOADING PHOTOS (${photos.length})` : "UPLOADING PHOTOS"}
+                      </span>
                     </div>
-                  ))}
+                  </label>
                 </div>
-              )}
 
-              <div className="flex justify-center">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className="bg-blue-600 text-white font-propaganda font-bold px-6 py-2 rounded disabled:bg-blue-300"
-                >
-                  {saving ? "Saving..." : "Submit"}
-                </button>
-              </div>
-            </form>
+                {/* Display selected photos */}
+                {photos.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {photos.map((photo, index) => (
+                      <div key={index} className="relative">
+                        <img
+                          src={URL.createObjectURL(photo)}
+                          alt={`Preview ${index + 1}`}
+                          className="w-20 h-20 object-cover rounded border border-gray-300"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const newPhotos = photos.filter((_, i) => i !== index);
+                            setPhotos(newPhotos);
+                            setUploadingPhotos(newPhotos.length > 0);
+                          }}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex justify-center">
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="bg-blue-600 text-white font-propaganda font-bold px-6 py-2 rounded disabled:bg-blue-300"
+                  >
+                    {saving ? "Saving..." : "Submit"}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
 
