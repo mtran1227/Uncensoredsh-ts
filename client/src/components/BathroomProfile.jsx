@@ -17,8 +17,6 @@ const BathroomProfile = () => {
   const [comment, setComment] = useState("");
   const [photos, setPhotos] = useState([]);
   const [uploadingPhotos, setUploadingPhotos] = useState(false);
-  const [isInHistory, setIsInHistory] = useState(false);
-  const [checkingHistory, setCheckingHistory] = useState(true);
   const user = JSON.parse(localStorage.getItem("user"));
   const token = localStorage.getItem("token");
 
@@ -118,16 +116,16 @@ const BathroomProfile = () => {
         setBathroom(b.data);
         setReviews(r.data);
         
-        // Check if bathroom is in user's history (favorites)
+        // Preload user's existing review if they have one and bathroom is in their history
         if (user && token) {
           try {
+            // Check if bathroom is in user's history (favorites)
             const favoritesRes = await axios.get(`${API_URL}/user/favorites`, {
               headers: authHeaders
             });
             const favorites = favoritesRes.data || [];
             const bathroomId = b.data?._id || id;
             
-            // Check if this bathroom is in favorites by ID or name
             const normalizeId = (id) => {
               if (!id) return null;
               if (typeof id === 'string') return id.toLowerCase().trim();
@@ -141,7 +139,7 @@ const BathroomProfile = () => {
               return name.toLowerCase().trim().replace(/\s+/g, ' ');
             };
             
-            const isInFavorites = favorites.some(fav => {
+            const isInHistory = favorites.some(fav => {
               const favId = normalizeId(fav._id || fav);
               const bathroomIdStr = normalizeId(bathroomId);
               const favName = normalizeName(fav.name);
@@ -151,13 +149,37 @@ const BathroomProfile = () => {
                      (favName && bathroomName && favName === bathroomName);
             });
             
-            setIsInHistory(isInFavorites);
+            // If bathroom is in history, find and preload user's review
+            if (isInHistory && r.data && Array.isArray(r.data)) {
+              const myReview = r.data.find(rev => {
+                // Match by userId
+                if (rev.userId) {
+                  const revUserId = rev.userId._id ? rev.userId._id.toString() : rev.userId.toString();
+                  const currentUserId = (user.id || user._id)?.toString();
+                  if (revUserId && currentUserId && revUserId === currentUserId) {
+                    return true;
+                  }
+                }
+                // Match by email
+                if (rev.userEmail && user.email && rev.userEmail.toLowerCase() === user.email.toLowerCase()) {
+                  return true;
+                }
+                // Match by username
+                if (rev.userName && user.username && rev.userName.toLowerCase() === user.username.toLowerCase()) {
+                  return true;
+                }
+                return false;
+              });
+              
+              // Preload the review into the form
+              if (myReview) {
+                setRating(myReview.ratings?.overall || 0);
+                setComment(myReview.comment || "");
+              }
+            }
           } catch (err) {
-            console.error("Error checking history:", err);
-            setIsInHistory(false);
+            console.error("Error checking history or preloading review:", err);
           }
-        } else {
-          setIsInHistory(false);
         }
       } catch (err) {
         console.error("Fetch error", err);
@@ -165,10 +187,8 @@ const BathroomProfile = () => {
           setBathroom(fallbackBathrooms[id]);
           setReviews([]);
         }
-        setIsInHistory(false);
       } finally {
         setLoading(false);
-        setCheckingHistory(false);
       }
     };
     fetchData();
@@ -202,46 +222,9 @@ const BathroomProfile = () => {
       setRating(0);
       setComment("");
       setMessage("Review submitted! This bathroom has been added to your history.");
-      // Refresh history check
-      if (user && token) {
-        try {
-          const favoritesRes = await axios.get(`${API_URL}/user/favorites`, {
-            headers: authHeaders
-          });
-          const favorites = favoritesRes.data || [];
-          const bathroomId = bathroom?._id || id;
-          const normalizeId = (id) => {
-            if (!id) return null;
-            if (typeof id === 'string') return id.toLowerCase().trim();
-            if (id._id) return id._id.toString().toLowerCase().trim();
-            if (id.toString) return id.toString().toLowerCase().trim();
-            return null;
-          };
-          const normalizeName = (name) => {
-            if (!name) return '';
-            return name.toLowerCase().trim().replace(/\s+/g, ' ');
-          };
-          const isInFavorites = favorites.some(fav => {
-            const favId = normalizeId(fav._id || fav);
-            const bathroomIdStr = normalizeId(bathroomId);
-            const favName = normalizeName(fav.name);
-            const bathroomName = normalizeName(bathroom?.name);
-            return (favId && bathroomIdStr && favId === bathroomIdStr) ||
-                   (favName && bathroomName && favName === bathroomName);
-          });
-          setIsInHistory(isInFavorites);
-        } catch (err) {
-          console.error("Error refreshing history check:", err);
-        }
-      }
     } catch (err) {
       console.error(err);
-      const errorMsg = err.response?.data?.error || "Submit failed";
-      alert(errorMsg);
-      // If error is about not being in history, update state
-      if (errorMsg.includes("history")) {
-        setIsInHistory(false);
-      }
+      alert(err.response?.data?.error || "Submit failed");
     } finally {
       setSaving(false);
     }
@@ -363,24 +346,10 @@ const BathroomProfile = () => {
           {/* Rating form */}
           <div className="bg-gray-50 border border-gray-200 rounded-2xl p-6">
             <h3 className="text-blue-600 font-propaganda text-2xl mb-2 text-center">Been here?</h3>
-            {!user ? (
-              <p className="text-gray-700 mb-3 text-center">Please sign in to leave a review.</p>
-            ) : checkingHistory ? (
-              <p className="text-gray-700 mb-3 text-center">Checking...</p>
-            ) : !isInHistory ? (
-              <div className="mb-3">
-                <p className="text-red-600 mb-2 text-center font-bold">You can only review bathrooms in your history.</p>
-                <p className="text-gray-700 text-sm text-center">Add this bathroom to your history first to leave a review.</p>
-              </div>
-            ) : (
-              <p className="text-gray-700 mb-3 text-center">Give your own rating:</p>
-            )}
-            {isInHistory && user && (
-              <RatingStars value={rating} onChange={(val) => setRating(val)} />
-            )}
+            <p className="text-gray-700 mb-3 text-center">Give your own rating:</p>
+            <RatingStars value={rating} onChange={(val) => setRating(val)} />
 
-            {isInHistory && user && (
-              <form onSubmit={handleSubmit} className="mt-4 space-y-3">
+            <form onSubmit={handleSubmit} className="mt-4 space-y-3">
                 <input
                   type="text"
                   placeholder="Write your review..."
@@ -446,11 +415,10 @@ const BathroomProfile = () => {
                     disabled={saving}
                     className="bg-blue-600 text-white font-propaganda font-bold px-6 py-2 rounded disabled:bg-blue-300"
                   >
-                    {saving ? "Saving..." : "Submit"}
-                  </button>
-                </div>
-              </form>
-            )}
+                  {saving ? "Saving..." : "Submit"}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
 
