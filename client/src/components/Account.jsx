@@ -105,16 +105,61 @@ useEffect(() => {
           if (id.toString) return id.toString().toLowerCase().trim();
           return null;
         };
-        const apiIds = new Set(apiData.map(b => normalizeId(b._id || b)));
-        const fallbackToAdd = fallbackBucketList.filter(b => {
-          const id = normalizeId(b._id);
-          return !apiIds.has(id);
+        const normalizeName = (name) => {
+          if (!name) return '';
+          return name.toLowerCase().trim().replace(/\s+/g, ' ');
+        };
+        const isDuplicate = (b1, b2) => {
+          const id1 = normalizeId(b1._id || b1);
+          const id2 = normalizeId(b2._id || b2);
+          if (id1 && id2 && id1 === id2) return true;
+          const name1 = normalizeName(b1.name);
+          const name2 = normalizeName(b2.name);
+          if (name1 && name2 && name1 === name2) return true;
+          return false;
+        };
+        
+        // Remove duplicates from API data
+        const seenIds = new Set();
+        const uniqueApiData = apiData.filter(b => {
+          const id = normalizeId(b._id || b);
+          if (!id || seenIds.has(id)) return false;
+          seenIds.add(id);
+          return true;
         });
-        setBucketList([...apiData, ...fallbackToAdd]);
+        
+        // Filter fallback to avoid duplicates (check both ID and name)
+        const fallbackToAdd = fallbackBucketList.filter(fallbackBathroom => {
+          return !uniqueApiData.some(apiBathroom => 
+            isDuplicate(apiBathroom, fallbackBathroom)
+          );
+        });
+        
+        // Final deduplication pass
+        const finalSeen = new Set();
+        const finalBucketList = [...uniqueApiData, ...fallbackToAdd].filter(b => {
+          const id = normalizeId(b._id || b);
+          const name = normalizeName(b.name);
+          const key = `${id || ''}|${name || ''}`;
+          if (!key || finalSeen.has(key)) return false;
+          for (const seenKey of finalSeen) {
+            const [seenId, seenName] = seenKey.split('|');
+            if ((id && seenId && id === seenId) || (name && seenName && name === seenName)) {
+              return false;
+            }
+          }
+          finalSeen.add(key);
+          return true;
+        });
+        
+        setBucketList(finalBucketList);
+        // Update count to match actual bucket list length
+        setBucketListCount(finalBucketList.length);
       })
       .catch((err) => {
         console.log("Error loading bucket list:", err);
         setBucketList(fallbackBucketList);
+        setBucketListCount(fallbackBucketList.length);
       });
   }, []);
   // --- HANDLE PHOTO UPLOAD ---
@@ -166,7 +211,7 @@ useEffect(() => {
   });
 
   const displayShitIn = historyList.length || shitInCount;
-  // Count includes both API items and fallback items (to match BucketList page behavior)
+  // Use the actual bucket list length (after deduplication) to match what's displayed
   const displayBucket = bucketList.length;
 
   return (
