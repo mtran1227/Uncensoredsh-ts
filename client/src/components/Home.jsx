@@ -397,9 +397,9 @@ const Home = () => {
             
             let pinColor, circleColor, strokeColor, strokeWidth;
             if (visited) {
-              // Priority 1: White pin with white circle for visited/history bathrooms
+              // Priority 1: White pin with blue center for visited/history bathrooms
               pinColor = '#FFFFFF';
-              circleColor = '#FFFFFF';
+              circleColor = '#004DFF';
               strokeColor = '#004DFF';
               strokeWidth = '2';
             } else if (inBucketList) {
@@ -428,7 +428,7 @@ const Home = () => {
                   url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
                     <svg width="30" height="40" xmlns="http://www.w3.org/2000/svg">
                       <path d="M15 0C8.4 0 3 5.4 3 12c0 8.3 12 28 12 28s12-19.7 12-28c0-6.6-5.4-12-12-12z" fill="${pinColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
-                      <circle cx="15" cy="12" r="6" fill="${circleColor}" ${visited ? 'stroke="#004DFF" stroke-width="1.5"' : ''}/>
+                      <circle cx="15" cy="12" r="6" fill="${circleColor}"/>
                     </svg>
                   `)
                 }}
