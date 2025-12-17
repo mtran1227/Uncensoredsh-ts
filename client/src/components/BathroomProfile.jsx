@@ -364,14 +364,20 @@ const BathroomProfile = () => {
           <div className="space-y-4">
             {reviews.map((rev) => {
               const username = rev.userName || rev.userId?.username || "anonymous";
-              const revUserId = rev.userId?._id || rev.userId || rev.userEmail;
-              const currentUserId = user?.id || user?._id || user?.email;
-              const isMyReview = revUserId && currentUserId && (
-                revUserId.toString() === currentUserId.toString() || 
-                rev.userEmail === user?.email
+              
+              // Check if this review belongs to the current user
+              // Reviews can have userId as ObjectId, populated user object, or userEmail
+              const revUserId = rev.userId?._id || rev.userId;
+              const currentUserId = user?.id || user?._id;
+              
+              // Multiple ways to match: by ID, email, or username
+              const isMyReview = user && (
+                (revUserId && currentUserId && revUserId.toString() === currentUserId.toString()) ||
+                (rev.userEmail && user.email && rev.userEmail.toLowerCase() === user.email.toLowerCase()) ||
+                (rev.userName && user.username && rev.userName.toLowerCase() === user.username.toLowerCase())
               );
               
-              // Only show profile photo for the current user's own reviews
+              // Only show profile photo for the current user's own reviews - explicitly set to null for others
               const userProfilePhoto = isMyReview ? (rev.userId?.profilePhoto || rev.profilePhoto || user?.profilePhoto) : null;
               
               return (
