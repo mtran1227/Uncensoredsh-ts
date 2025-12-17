@@ -390,9 +390,9 @@ const Home = () => {
             
             let pinColor, circleColor, strokeColor, strokeWidth;
             if (visited) {
-              // Priority 1: White pin for visited/history bathrooms
+              // Priority 1: White pin with white circle for visited/history bathrooms
               pinColor = '#FFFFFF';
-              circleColor = '#004DFF';
+              circleColor = '#FFFFFF';
               strokeColor = '#004DFF';
               strokeWidth = '2';
             } else if (inBucketList) {
