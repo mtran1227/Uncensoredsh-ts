@@ -149,11 +149,13 @@ const Home = () => {
       // Convert to same format as visitedBathrooms for consistency
       // Include both ID and name for better matching
       const favorites = res.data || [];
-      setVisitedBathrooms(favorites.map(f => ({ 
+      const visitedData = favorites.map(f => ({ 
         bathroomId: f._id || f,
         _id: f._id || f,
         name: f.name
-      })));
+      }));
+      console.log('Visited bathrooms loaded:', visitedData.length, visitedData);
+      setVisitedBathrooms(visitedData);
     } catch (err) {
       console.error("Error loading visited pins:", err);
     }
@@ -268,7 +270,7 @@ const Home = () => {
     const normalizedId = normalizeId(bathroom._id);
     const normalizedName = normalizeName(bathroom.name);
     
-    return visitedBathrooms.some((v) => {
+    const isMatch = visitedBathrooms.some((v) => {
       // Handle different structures: v.bathroomId, v._id, or v itself
       const visitedBathroom = v.bathroomId || v._id || v;
       const visitedId = normalizeId(typeof visitedBathroom === 'object' ? visitedBathroom._id : visitedBathroom);
@@ -283,6 +285,11 @@ const Home = () => {
       }
       return false;
     });
+    
+    if (isMatch) {
+      console.log('Bathroom marked as visited:', bathroom.name, normalizedId, normalizedName);
+    }
+    return isMatch;
   };
 
   // Helper function to check if a bathroom is in bucket list (but NOT visited)
