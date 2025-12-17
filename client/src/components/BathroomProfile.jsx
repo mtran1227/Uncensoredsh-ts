@@ -478,8 +478,9 @@ const BathroomProfile = () => {
               }
               
               // Only show profile photo for the current user's own reviews
+              // Use ONLY the current user's profile photo, never the review author's photo
               // For all other reviews, explicitly set to null to show default avatar
-              const userProfilePhoto = isMyReview ? (rev.userId?.profilePhoto || user?.profilePhoto) : null;
+              const userProfilePhoto = isMyReview ? user?.profilePhoto : null;
               
               return (
                 <div key={rev._id} className="flex gap-3 items-start">
