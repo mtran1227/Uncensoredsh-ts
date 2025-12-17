@@ -33,15 +33,38 @@ const BucketList = () => {
   useEffect(() => {
     fetch(`${API_URL}/user/bucket`, { headers: authHeaders() })
       .then((res) => res.json())
-      .then((data) => {
+      .then(async (data) => {
         // Combine API data with fallback, avoiding duplicates
         const apiData = data && Array.isArray(data) ? data : [];
-        const apiIds = new Set(apiData.map(b => normalizeId(b._id || b)));
+        
+        // Fetch full bathroom data for items missing images
+        const enrichedData = await Promise.all(
+          apiData.map(async (bathroom) => {
+            // If bathroom has images, return as is
+            if (bathroom.images && bathroom.images.length > 0) {
+              return bathroom;
+            }
+            
+            // Otherwise, fetch full bathroom data to get images
+            try {
+              const fullBathroomRes = await fetch(`${API_URL}/bathrooms/${bathroom._id}`);
+              if (fullBathroomRes.ok) {
+                const fullBathroom = await fullBathroomRes.json();
+                return { ...bathroom, images: fullBathroom.images || bathroom.images };
+              }
+            } catch (err) {
+              console.log(`Error fetching full data for ${bathroom._id}:`, err);
+            }
+            return bathroom;
+          })
+        );
+        
+        const apiIds = new Set(enrichedData.map(b => normalizeId(b._id || b)));
         const fallbackToAdd = fallbackBucketList.filter(b => {
           const id = normalizeId(b._id);
           return !apiIds.has(id);
         });
-        setBucketList([...apiData, ...fallbackToAdd]);
+        setBucketList([...enrichedData, ...fallbackToAdd]);
         setLoading(false);
       })
       .catch((err) => {
@@ -99,12 +122,35 @@ const BucketList = () => {
       
       // Combine API data with fallback, avoiding duplicates
       const apiData = refreshData && Array.isArray(refreshData) ? refreshData : [];
-      const apiIds = new Set(apiData.map(b => normalizeId(b._id || b)));
+      
+      // Fetch full bathroom data for items missing images
+      const enrichedData = await Promise.all(
+        apiData.map(async (bathroom) => {
+          // If bathroom has images, return as is
+          if (bathroom.images && bathroom.images.length > 0) {
+            return bathroom;
+          }
+          
+          // Otherwise, fetch full bathroom data to get images
+          try {
+            const fullBathroomRes = await fetch(`${API_URL}/bathrooms/${bathroom._id}`);
+            if (fullBathroomRes.ok) {
+              const fullBathroom = await fullBathroomRes.json();
+              return { ...bathroom, images: fullBathroom.images || bathroom.images };
+            }
+          } catch (err) {
+            console.log(`Error fetching full data for ${bathroom._id}:`, err);
+          }
+          return bathroom;
+        })
+      );
+      
+      const apiIds = new Set(enrichedData.map(b => normalizeId(b._id || b)));
       const fallbackToAdd = fallbackBucketList.filter(b => {
         const id = normalizeId(b._id);
         return !apiIds.has(id);
       });
-      setBucketList([...apiData, ...fallbackToAdd]);
+      setBucketList([...enrichedData, ...fallbackToAdd]);
       
       setShowAddModal(false);
       setSearchTerm("");
@@ -165,8 +211,17 @@ const BucketList = () => {
       // Ensure it starts with / for relative paths
       return imageUrl.startsWith('/') ? imageUrl : `/${imageUrl}`;
     }
-    // Fallback to a bathroom placeholder image instead of bedroom
-    return "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80";
+    // Use a unique placeholder based on bathroom name to avoid all showing the same image
+    const nameHash = item?.name ? item.name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0) : 0;
+    const placeholderIndex = nameHash % 5; // Use 5 different placeholder images
+    const placeholders = [
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80",
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80&sig=1",
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80&sig=2",
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80&sig=3",
+      "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=800&q=80&sig=4"
+    ];
+    return placeholders[placeholderIndex];
   };
 
   return (
