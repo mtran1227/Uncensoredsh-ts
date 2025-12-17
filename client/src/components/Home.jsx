@@ -386,7 +386,7 @@ const Home = () => {
 
           {/* PINS: All NYU bathrooms displayed with correct colors
               - White pins: visited/history bathrooms (highest priority)
-              - Super dark blue pins: bucketlist bathrooms (not visited)
+              - Light blue pins: bucketlist bathrooms (not visited)
               - Dark blue pins: all other bathrooms */}
           {markerBathrooms.map(bathroom => {
             if (!bathroom.geoLocation?.coordinates) return null;
@@ -403,8 +403,8 @@ const Home = () => {
               strokeColor = '#004DFF';
               strokeWidth = '2';
             } else if (inBucketList) {
-              // Priority 2: Super dark blue pin for bucketlist bathrooms (not visited)
-              pinColor = '#001A66';
+              // Priority 2: Light blue pin for bucketlist bathrooms (not visited)
+              pinColor = '#87CEEB';
               circleColor = 'white';
               strokeColor = '#004DFF';
               strokeWidth = '1';
