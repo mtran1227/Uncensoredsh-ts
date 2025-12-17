@@ -59,12 +59,36 @@ const BucketList = () => {
           })
         );
         
-        const apiIds = new Set(enrichedData.map(b => normalizeId(b._id || b)));
+        // Remove duplicates from enriched data first
+        const seenIds = new Set();
+        const uniqueEnrichedData = enrichedData.filter(b => {
+          const id = normalizeId(b._id || b);
+          if (!id || seenIds.has(id)) {
+            return false;
+          }
+          seenIds.add(id);
+          return true;
+        });
+        
+        // Then filter fallback to avoid duplicates
+        const apiIds = new Set(uniqueEnrichedData.map(b => normalizeId(b._id || b)));
         const fallbackToAdd = fallbackBucketList.filter(b => {
           const id = normalizeId(b._id);
           return !apiIds.has(id);
         });
-        setBucketList([...enrichedData, ...fallbackToAdd]);
+        
+        // Final deduplication pass to be absolutely sure
+        const finalSeenIds = new Set();
+        const finalBucketList = [...uniqueEnrichedData, ...fallbackToAdd].filter(b => {
+          const id = normalizeId(b._id || b);
+          if (!id || finalSeenIds.has(id)) {
+            return false;
+          }
+          finalSeenIds.add(id);
+          return true;
+        });
+        
+        setBucketList(finalBucketList);
         setLoading(false);
       })
       .catch((err) => {
@@ -145,12 +169,36 @@ const BucketList = () => {
         })
       );
       
-      const apiIds = new Set(enrichedData.map(b => normalizeId(b._id || b)));
+      // Remove duplicates from enriched data first
+      const seenIds = new Set();
+      const uniqueEnrichedData = enrichedData.filter(b => {
+        const id = normalizeId(b._id || b);
+        if (!id || seenIds.has(id)) {
+          return false;
+        }
+        seenIds.add(id);
+        return true;
+      });
+      
+      // Then filter fallback to avoid duplicates
+      const apiIds = new Set(uniqueEnrichedData.map(b => normalizeId(b._id || b)));
       const fallbackToAdd = fallbackBucketList.filter(b => {
         const id = normalizeId(b._id);
         return !apiIds.has(id);
       });
-      setBucketList([...enrichedData, ...fallbackToAdd]);
+      
+      // Final deduplication pass to be absolutely sure
+      const finalSeenIds = new Set();
+      const finalBucketList = [...uniqueEnrichedData, ...fallbackToAdd].filter(b => {
+        const id = normalizeId(b._id || b);
+        if (!id || finalSeenIds.has(id)) {
+          return false;
+        }
+        finalSeenIds.add(id);
+        return true;
+      });
+      
+      setBucketList(finalBucketList);
       
       setShowAddModal(false);
       setSearchTerm("");
@@ -253,10 +301,12 @@ const BucketList = () => {
         <p className="text-gray-500">Loading...</p>
       ) : (
         <div className="grid grid-cols-3 gap-6">
-          {bucketList.map((b) => (
+          {bucketList.map((b, index) => {
+            const uniqueKey = b._id || `bucket-${index}-${b.name}`;
+            return (
             <Link
               to={`/bathrooms/${b._id}`}
-              key={b._id}
+              key={uniqueKey}
               className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
             >
               <img
@@ -281,7 +331,8 @@ const BucketList = () => {
                 </div>
               </div>
             </Link>
-          ))}
+            );
+          })}
         </div>
       )}
 
