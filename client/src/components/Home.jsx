@@ -388,22 +388,26 @@ const Home = () => {
             const visited = isVisited(bathroom);
             const inBucketList = isInBucketList(bathroom); // Already checks !visited internally
             
-            let pinColor, circleColor, strokeColor, strokeWidth, pinSize, circleRadius;
+            let pinColor, circleColor, strokeColor, strokeWidth, pinWidth, pinHeight, circleRadius, centerX;
             if (visited) {
               // Priority 1: White pin for visited/history bathrooms - make it larger and more visible
               pinColor = '#FFFFFF';
               circleColor = '#004DFF';
               strokeColor = '#004DFF';
               strokeWidth = '3';
-              pinSize = 36;
-              circleRadius = 7;
+              pinWidth = 36;
+              pinHeight = 48;
+              centerX = 18;
+              circleRadius = 8;
             } else if (inBucketList) {
               // Priority 2: Light blue pin for bucketlist bathrooms (not visited)
               pinColor = '#87CEEB';
               circleColor = 'white';
               strokeColor = '#004DFF';
               strokeWidth = '2';
-              pinSize = 30;
+              pinWidth = 30;
+              pinHeight = 40;
+              centerX = 15;
               circleRadius = 6;
             } else {
               // Priority 3: Regular dark blue pin for all other bathrooms
@@ -411,7 +415,9 @@ const Home = () => {
               circleColor = 'white';
               strokeColor = 'none';
               strokeWidth = '0';
-              pinSize = 30;
+              pinWidth = 30;
+              pinHeight = 40;
+              centerX = 15;
               circleRadius = 6;
             }
             
@@ -425,14 +431,14 @@ const Home = () => {
                 onClick={() => setSelectedBathroom(bathroom)}
                 icon={{
                   url: 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(`
-                    <svg width="${pinSize}" height="${pinSize + 10}" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M${pinSize/2} 0C${pinSize/2 - 5.4} 0 ${pinSize/2 - 12} ${pinSize/2 - 6.6} ${pinSize/2 - 12} ${pinSize/2 + 2}c0 8.3 ${pinSize/2 - 3} ${pinSize - 2} ${pinSize/2 - 3} ${pinSize - 2}s${pinSize/2 - 3} ${-pinSize + 10.3} ${pinSize/2 - 3} ${-pinSize + 2}c0-6.6-5.4-12-12-12z" fill="${pinColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
-                      <circle cx="${pinSize/2}" cy="${pinSize/2 + 2}" r="${circleRadius}" fill="${circleColor}"/>
-                      ${visited ? `<circle cx="${pinSize/2}" cy="${pinSize/2 + 2}" r="${circleRadius - 2}" fill="${pinColor}"/>` : ''}
+                    <svg width="${pinWidth}" height="${pinHeight}" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M${centerX} 0C${centerX - 5.4} 0 ${centerX - 12} 5.4 ${centerX - 12} 12c0 8.3 ${centerX - 9} 28 ${centerX - 9} 28s${centerX - 9} -19.7 ${centerX - 9} -28c0-6.6-5.4-12-12-12z" fill="${pinColor}" stroke="${strokeColor}" stroke-width="${strokeWidth}"/>
+                      <circle cx="${centerX}" cy="12" r="${circleRadius}" fill="${circleColor}"/>
+                      ${visited ? `<circle cx="${centerX}" cy="12" r="${circleRadius - 3}" fill="${pinColor}"/>` : ''}
                     </svg>
                   `),
-                  scaledSize: new window.google.maps.Size(pinSize, pinSize + 10),
-                  anchor: new window.google.maps.Point(pinSize/2, pinSize + 10)
+                  scaledSize: new window.google.maps.Size(pinWidth, pinHeight),
+                  anchor: new window.google.maps.Point(centerX, pinHeight)
                 }}
               />
             );
