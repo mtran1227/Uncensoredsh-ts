@@ -146,16 +146,11 @@ const Home = () => {
       const res = await axios.get(`${API_URL}/user/favorites`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      // Convert to same format as visitedBathrooms for consistency
-      // Include both ID and name for better matching
+      // Favorites API returns full bathroom objects with _id and name
+      // Store them directly for matching
       const favorites = res.data || [];
-      const visitedData = favorites.map(f => ({ 
-        bathroomId: f._id || f,
-        _id: f._id || f,
-        name: f.name
-      }));
-      console.log('Visited bathrooms loaded:', visitedData.length, visitedData);
-      setVisitedBathrooms(visitedData);
+      console.log('✅ Visited bathrooms loaded:', favorites.length, favorites.map(f => ({ id: f._id, name: f.name })));
+      setVisitedBathrooms(favorites);
     } catch (err) {
       console.error("Error loading visited pins:", err);
     }
@@ -271,10 +266,9 @@ const Home = () => {
     const normalizedName = normalizeName(bathroom.name);
     
     const isMatch = visitedBathrooms.some((v) => {
-      // Handle different structures: v.bathroomId, v._id, or v itself
-      const visitedBathroom = v.bathroomId || v._id || v;
-      const visitedId = normalizeId(typeof visitedBathroom === 'object' ? visitedBathroom._id : visitedBathroom);
-      const visitedName = normalizeName(v.name || (typeof visitedBathroom === 'object' ? visitedBathroom.name : ''));
+      // v is already a bathroom object from favorites API (with _id and name)
+      const visitedId = normalizeId(v._id || v.bathroomId);
+      const visitedName = normalizeName(v.name);
       
       // Match by ID first (most reliable), then by name
       if (normalizedId && visitedId && normalizedId === visitedId) {
@@ -286,18 +280,13 @@ const Home = () => {
       return false;
     });
     
-    if (isMatch) {
-      console.log('Bathroom marked as visited:', bathroom.name, normalizedId, normalizedName);
-    }
     return isMatch;
   };
 
-  // Helper function to check if a bathroom is in bucket list (but NOT visited)
-  // Only check bucketlist if not already visited (visited takes priority)
+  // Helper function to check if a bathroom is in bucket list
+  // Note: This should only be called when we know it's NOT visited
   const isInBucketList = (bathroom) => {
-    if (!bathroom) return false;
-    // Don't check bucketlist if already visited
-    if (isVisited(bathroom)) return false;
+    if (!bathroom || bucketList.length === 0) return false;
     
     const normalizedId = normalizeId(bathroom._id);
     const normalizedName = normalizeName(bathroom.name);
@@ -306,9 +295,14 @@ const Home = () => {
       const bucketId = normalizeId(b._id || b.bathroomId?._id);
       const bucketName = normalizeName(b.name);
       
-      // Match by ID or name (exact match to avoid false positives)
-      return (normalizedId && bucketId && normalizedId === bucketId) || 
-             (normalizedName && bucketName && normalizedName === bucketName);
+      // Match by ID first (most reliable), then by name
+      if (normalizedId && bucketId && normalizedId === bucketId) {
+        return true;
+      }
+      if (normalizedName && bucketName && normalizedName === bucketName) {
+        return true;
+      }
+      return false;
     });
   };
 
@@ -385,15 +379,21 @@ const Home = () => {
           />
 
           {/* PINS: All NYU bathrooms displayed with correct colors
-              - White pins: visited/history bathrooms (highest priority)
-              - Light blue pins: bucketlist bathrooms (not visited)
-              - Dark blue pins: all other bathrooms */}
+              - White pins: visited/history bathrooms (highest priority - NO OVERLAP)
+              - Light blue pins: bucketlist bathrooms (not visited - NO OVERLAP)
+              - Dark blue pins: all other bathrooms (unreviewed) */}
           {markerBathrooms.map(bathroom => {
             if (!bathroom.geoLocation?.coordinates) return null;
             
-            // Check categories in priority order to avoid overlap
+            // Check categories in strict priority order to prevent overlap
+            // Priority 1: Visited (history/favorites) - highest priority
             const visited = isVisited(bathroom);
-            const inBucketList = isInBucketList(bathroom); // Already checks !visited internally
+            
+            // Priority 2: Bucket list (only if NOT visited)
+            const inBucketList = !visited && isInBucketList(bathroom);
+            
+            // Priority 3: Unreviewed (neither visited nor in bucket list)
+            // No need to check - it's the default
             
             let pinColor, circleColor, strokeColor, strokeWidth;
             if (visited) {
@@ -409,7 +409,7 @@ const Home = () => {
               strokeColor = '#004DFF';
               strokeWidth = '1';
             } else {
-              // Priority 3: Regular dark blue pin for all other bathrooms
+              // Priority 3: Regular dark blue pin for all other bathrooms (unreviewed)
               pinColor = '#004DFF';
               circleColor = 'white';
               strokeColor = 'none';
