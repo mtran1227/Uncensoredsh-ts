@@ -51,24 +51,6 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // Add to favorites (history) when user reviews
-    const user = await User.findById(userId);
-    if (user) {
-      const isInFavorites = user.favorites.some(id => id.toString() === normalizedBathroomId.toString());
-      if (!isInFavorites) {
-        // Remove from bucketlist if it's there (to prevent overlap)
-        const wasInBucketList = user.bucketList.some(id => id.toString() === normalizedBathroomId.toString());
-        if (wasInBucketList) {
-          user.bucketList = user.bucketList.filter(id => id.toString() !== normalizedBathroomId.toString());
-          user.bucketListCount = user.bucketList.length;
-        }
-        // Add to favorites
-        user.favorites.push(normalizedBathroomId);
-        user.shitInCount = user.favorites.length;
-        await user.save();
-      }
-    }
-
     // ------------------------------------------------------
     // Recalculate bathroom average rating (blend hardcoded with user ratings)
     // ------------------------------------------------------
