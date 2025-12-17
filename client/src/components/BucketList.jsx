@@ -59,7 +59,7 @@ const BucketList = () => {
           })
         );
         
-        // Remove duplicates from enriched data first
+        // Remove duplicates from enriched data first (by ID)
         const seenIds = new Set();
         const uniqueEnrichedData = enrichedData.filter(b => {
           const id = normalizeId(b._id || b);
@@ -70,21 +70,34 @@ const BucketList = () => {
           return true;
         });
         
-        // Then filter fallback to avoid duplicates
-        const apiIds = new Set(uniqueEnrichedData.map(b => normalizeId(b._id || b)));
-        const fallbackToAdd = fallbackBucketList.filter(b => {
-          const id = normalizeId(b._id);
-          return !apiIds.has(id);
+        // Then filter fallback to avoid duplicates (check both ID and name)
+        const fallbackToAdd = fallbackBucketList.filter(fallbackBathroom => {
+          // Check if any enriched bathroom matches by ID or name
+          return !uniqueEnrichedData.some(apiBathroom => 
+            isDuplicate(apiBathroom, fallbackBathroom)
+          );
         });
         
-        // Final deduplication pass to be absolutely sure
-        const finalSeenIds = new Set();
+        // Final deduplication pass using both ID and name matching
+        const finalSeen = new Set();
         const finalBucketList = [...uniqueEnrichedData, ...fallbackToAdd].filter(b => {
           const id = normalizeId(b._id || b);
-          if (!id || finalSeenIds.has(id)) {
+          const name = normalizeName(b.name);
+          const key = `${id || ''}|${name || ''}`;
+          
+          if (!key || finalSeen.has(key)) {
             return false;
           }
-          finalSeenIds.add(id);
+          
+          // Also check if this bathroom is a duplicate of any already seen
+          for (const seenKey of finalSeen) {
+            const [seenId, seenName] = seenKey.split('|');
+            if ((id && seenId && id === seenId) || (name && seenName && name === seenName)) {
+              return false;
+            }
+          }
+          
+          finalSeen.add(key);
           return true;
         });
         
@@ -169,7 +182,7 @@ const BucketList = () => {
         })
       );
       
-      // Remove duplicates from enriched data first
+      // Remove duplicates from enriched data first (by ID)
       const seenIds = new Set();
       const uniqueEnrichedData = enrichedData.filter(b => {
         const id = normalizeId(b._id || b);
@@ -180,21 +193,34 @@ const BucketList = () => {
         return true;
       });
       
-      // Then filter fallback to avoid duplicates
-      const apiIds = new Set(uniqueEnrichedData.map(b => normalizeId(b._id || b)));
-      const fallbackToAdd = fallbackBucketList.filter(b => {
-        const id = normalizeId(b._id);
-        return !apiIds.has(id);
+      // Then filter fallback to avoid duplicates (check both ID and name)
+      const fallbackToAdd = fallbackBucketList.filter(fallbackBathroom => {
+        // Check if any enriched bathroom matches by ID or name
+        return !uniqueEnrichedData.some(apiBathroom => 
+          isDuplicate(apiBathroom, fallbackBathroom)
+        );
       });
       
-      // Final deduplication pass to be absolutely sure
-      const finalSeenIds = new Set();
+      // Final deduplication pass using both ID and name matching
+      const finalSeen = new Set();
       const finalBucketList = [...uniqueEnrichedData, ...fallbackToAdd].filter(b => {
         const id = normalizeId(b._id || b);
-        if (!id || finalSeenIds.has(id)) {
+        const name = normalizeName(b.name);
+        const key = `${id || ''}|${name || ''}`;
+        
+        if (!key || finalSeen.has(key)) {
           return false;
         }
-        finalSeenIds.add(id);
+        
+        // Also check if this bathroom is a duplicate of any already seen
+        for (const seenKey of finalSeen) {
+          const [seenId, seenName] = seenKey.split('|');
+          if ((id && seenId && id === seenId) || (name && seenName && name === seenName)) {
+            return false;
+          }
+        }
+        
+        finalSeen.add(key);
         return true;
       });
       
@@ -236,6 +262,32 @@ const BucketList = () => {
     if (id._id) return id._id.toString().toLowerCase().trim();
     if (id.toString) return id.toString().toLowerCase().trim();
     return null;
+  };
+
+  // Helper function to normalize bathroom name for comparison
+  const normalizeName = (name) => {
+    if (!name) return '';
+    return name.toLowerCase().trim().replace(/\s+/g, ' ');
+  };
+
+  // Helper function to check if two bathrooms are duplicates (by ID or name)
+  const isDuplicate = (b1, b2) => {
+    const id1 = normalizeId(b1._id || b1);
+    const id2 = normalizeId(b2._id || b2);
+    
+    // If IDs match, they're duplicates
+    if (id1 && id2 && id1 === id2) {
+      return true;
+    }
+    
+    // If names match (normalized), they're likely duplicates
+    const name1 = normalizeName(b1.name);
+    const name2 = normalizeName(b2.name);
+    if (name1 && name2 && name1 === name2) {
+      return true;
+    }
+    
+    return false;
   };
 
   // Check if bathroom is already in bucket list
