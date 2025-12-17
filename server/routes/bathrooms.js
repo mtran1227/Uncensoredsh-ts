@@ -3,6 +3,72 @@ const router = express.Router();
 const Bathroom = require('../models/Bathroom');
 const User = require('../models/User');
 
+// NYU Campus boundaries (Greenwich Village + Brooklyn campuses)
+const NYU_BOUNDARIES = {
+  // Main Washington Square Campus
+  washingtonSquare: {
+    minLat: 40.725,
+    maxLat: 40.735,
+    minLng: -74.002,
+    maxLng: -73.990
+  },
+  // Brooklyn Campus (MetroTech)
+  brooklyn: {
+    minLat: 40.690,
+    maxLat: 40.697,
+    minLng: -73.990,
+    maxLng: -73.980
+  }
+};
+
+// Known NYU building keywords
+const NYU_KEYWORDS = [
+  'bobst', 'kimmel', 'tisch', 'stern', 'silver', 'palladium', 
+  'metrotech', 'washington square', 'nyu', 'new york university',
+  'courant', 'gcasl', 'steinhardt', 'gallatin', 'law', 'vanderbilt',
+  'furman', 'd\'agostino', 'brown', 'king juan carlos', 'paulson',
+  'studentlink', 'founders', 'brittany', 'goddard', 'lipton',
+  'third north', 'university hall', 'carlyle', 'greenwich', 'rubin',
+  'weinstein', 'clark street', 'jacobs', 'rogers', '370 jay',
+  'dibner', 'makerspace', 'urban future lab', 'othmer'
+];
+
+/**
+ * Validates if a location is within NYU campus boundaries
+ * @param {number} lat - Latitude
+ * @param {number} lng - Longitude
+ * @param {string} address - Address string
+ * @param {string} name - Bathroom/building name
+ * @returns {boolean} - True if location is valid NYU location
+ */
+function isValidNYULocation(lat, lng, address = '', name = '') {
+  // Check coordinates against boundaries
+  const inWashingtonSquare = 
+    lat >= NYU_BOUNDARIES.washingtonSquare.minLat &&
+    lat <= NYU_BOUNDARIES.washingtonSquare.maxLat &&
+    lng >= NYU_BOUNDARIES.washingtonSquare.minLng &&
+    lng <= NYU_BOUNDARIES.washingtonSquare.maxLng;
+  
+  const inBrooklyn = 
+    lat >= NYU_BOUNDARIES.brooklyn.minLat &&
+    lat <= NYU_BOUNDARIES.brooklyn.maxLat &&
+    lng >= NYU_BOUNDARIES.brooklyn.minLng &&
+    lng <= NYU_BOUNDARIES.brooklyn.maxLng;
+  
+  // Check if coordinates are within boundaries
+  if (inWashingtonSquare || inBrooklyn) {
+    return true;
+  }
+  
+  // Fallback: Check address/name for NYU keywords (case-insensitive)
+  const searchText = `${address} ${name}`.toLowerCase();
+  const hasNYUKeyword = NYU_KEYWORDS.some(keyword => 
+    searchText.includes(keyword.toLowerCase())
+  );
+  
+  return hasNYUKeyword;
+}
+
 // GET all bathrooms (with optional filters + search)
 router.get('/', async (req, res) => {
   try {
@@ -74,6 +140,35 @@ router.get('/:id', async (req, res) => {
 // POST create new bathroom (with Google Maps pin)
 router.post('/', async (req, res) => {
   try {
+    const { geoLocation, location, name } = req.body;
+    
+    // Validate NYU location
+    if (geoLocation && geoLocation.coordinates) {
+      const [lng, lat] = geoLocation.coordinates;
+      const address = geoLocation.address || location || '';
+      const bathroomName = name || '';
+      
+      if (!isValidNYULocation(lat, lng, address, bathroomName)) {
+        return res.status(403).json({ 
+          error: 'Bathroom must be located at an NYU campus location. Please ensure the coordinates are within NYU campus boundaries (Washington Square or Brooklyn MetroTech areas).' 
+        });
+      }
+    } else {
+      // If no coordinates provided, check address/name only
+      const address = geoLocation?.address || location || '';
+      const bathroomName = name || '';
+      const searchText = `${address} ${bathroomName}`.toLowerCase();
+      const hasNYUKeyword = NYU_KEYWORDS.some(keyword => 
+        searchText.includes(keyword.toLowerCase())
+      );
+      
+      if (!hasNYUKeyword) {
+        return res.status(403).json({ 
+          error: 'Bathroom must be located at an NYU campus location. Please provide valid coordinates or an NYU building address.' 
+        });
+      }
+    }
+    
     const bathroom = new Bathroom(req.body);
     await bathroom.save();
     res.status(201).json(bathroom);
